@@ -30,7 +30,7 @@ class RSDProductIntroduceVC: UIViewController {
         // 加载普通URL
         webView?.webConfig = config
         let nowTime = Date().timeIntervalSince1970
-        let urlString = "http://doc.rsdznjj.com.cn:2000/index.html?\(nowTime)"
+        let urlString = "http://www.baidu.com"
         webView?.webloadType(self, .URLString(url:urlString))
         webView?.snp.makeConstraints({ (make) in
             make.left.bottom.right.equalToSuperview()

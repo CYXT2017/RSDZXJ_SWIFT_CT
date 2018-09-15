@@ -161,7 +161,7 @@ class RSDLoginVC: UIViewController ,UITextFieldDelegate,getRegisterUserNameDeleg
             print(error)
         }
         
-        //        HTTPConnection.postRequestWithBlock(urlStr:"https://l.rsdznjj.com.cn:9083/m/login", param:parm as Dictionary<String, AnyObject>) { (data, error) in
+        //        HTTPConnection.postRequestWithBlock(urlStr:"", param:parm as Dictionary<String, AnyObject>) { (data, error) in
         //            if error != nil {
         //                print("error:\(error!)")
         //            } else {
@@ -170,10 +170,10 @@ class RSDLoginVC: UIViewController ,UITextFieldDelegate,getRegisterUserNameDeleg
         //            }
         //        };
         
-        //        HTTPConnection.postRequestWithDelegate(urlStr: "https://l.rsdznjj.com.cn:9083/m/login", param: parm as Dictionary<String, AnyObject>, delegate: self);
+        //        HTTPConnection.postRequestWithDelegate(urlStr: "", param: parm as Dictionary<String, AnyObject>, delegate: self);
         
         
-//        loginModels.getUserDataForLoginDoing(parm: parm, url: "https://l.rsdznjj.com.cn:9083/m/login")
+//        loginModels.getUserDataForLoginDoing(parm: parm, url: "")
 //        let codeStr = loginModels.loginModel?.code
 //        if codeStr == "0000" {
 //            let  userDefaults = UserDefaults.standard

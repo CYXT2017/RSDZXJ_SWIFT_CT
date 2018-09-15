@@ -108,7 +108,7 @@ class RSDRegisterVC: UIViewController ,UITextFieldDelegate {
         var registerInt = 0;//默认0 未注册  1已注册
         var  parm = [String:String]()
         parm ["mobilephone"] = userPhoneStr
-        Alamofire.request("https://l.rsdznjj.com.cn:9083/m/exists", method: .post, parameters: parm).responseJSON { (response) in
+        Alamofire.request("", method: .post, parameters: parm).responseJSON { (response) in
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
@@ -146,7 +146,7 @@ class RSDRegisterVC: UIViewController ,UITextFieldDelegate {
         parm ["type"] = a
         parm ["check"] = check
         
-        Alamofire.request("https://l.rsdznjj.com.cn:9083/m/vcode", method: .post, parameters: parm).responseJSON { (response) in
+        Alamofire.request("", method: .post, parameters: parm).responseJSON { (response) in
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
@@ -255,7 +255,7 @@ class RSDRegisterVC: UIViewController ,UITextFieldDelegate {
 //        if self.userNameBlock != nil {
 //            self.userNameBlock!(self.userPhoneNumberStr!)
 //        }
-        Alamofire.request("https://l.rsdznjj.com.cn:9083/m/register", method: .post, parameters: parm).responseJSON { (response) in
+        Alamofire.request("", method: .post, parameters: parm).responseJSON { (response) in
             self.hideHudForPostApi()
             switch response.result {
             case .success(let value):
