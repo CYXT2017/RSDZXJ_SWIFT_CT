@@ -1,0 +1,12 @@
+
+*.swift
+*.xcworkspacedata
+*.plist
+*.xcuserstate
+*.xcscheme
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/.DS_Store
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/.DS_Store
+*.pbxproj
+ZhiXiangJiaSwift/Pods/.DS_Store
+ZhiXiangJiaSwift/.DS_Store
+.DS_Store
