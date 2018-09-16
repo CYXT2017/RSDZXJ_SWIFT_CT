@@ -195,8 +195,10 @@ extension RSDMyCenterViewController:UITableViewDelegate,UITableViewDataSource {
             newVC = RSDProductIntroduceVC()
         } else if currentCell.titleLabel?.text == "设备分享" {
             newVC = RSDequimentShareVC()
+            (newVC as! RSDequimentShareVC) .signInt = 0
         } else if currentCell.titleLabel?.text == "场景分享" {
-            newVC = RSDScaneShareVC()
+            newVC = RSDequimentShareVC()
+            (newVC as! RSDequimentShareVC).signInt = 1
         } else if currentCell.titleLabel?.text == "意见反馈" {
             newVC = RSDAdviceBackVC()
         } else if currentCell.titleLabel?.text == "常见问题" {

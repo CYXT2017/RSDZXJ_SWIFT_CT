@@ -14,7 +14,8 @@ class RSDSharedMeViewController: UIViewController {
     private var sharedForMeArray: [Any]
     private var deletIndex: Int = 0
     private var shareForMeFuncConfigDicArray: [Any]
-    
+    var signInt1 = 0
+
     //MARK: - LifeCycle
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         shareForMeFuncConfigDicArray = Array.init()

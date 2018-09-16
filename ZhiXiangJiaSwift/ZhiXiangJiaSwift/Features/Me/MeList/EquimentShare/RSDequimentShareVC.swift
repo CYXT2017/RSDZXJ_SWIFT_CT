@@ -9,10 +9,11 @@
 import UIKit
 import DNSPageView
 class RSDequimentShareVC: UIViewController {
-
+    var signInt = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        NotificationCenter.default.addObserver(self, selector: #selector(self.showOrHideNavRightBtn(_:)), name: NSNotification.Name(rawValue: "getCurrentIndexNotif"), object: nil)
         // 创建DNSPageStyle，设置样式
         let style = DNSPageStyle()
         //        style.isTitleScrollEnable = true
@@ -23,9 +24,14 @@ class RSDequimentShareVC: UIViewController {
         style.titleColor = UIColor.gray
 //        style.bottomLineColor = UIColor.navBackGroundColor
 //        style.bottomLineHeight = 2
-        
         let titles = ["我分享的","被分享的"]
-        let viewControllers:[UIViewController] = [RSDMyShareViewController(),RSDSharedMeViewController()]
+        let rsdMyShareVC = RSDMyShareViewController()
+        rsdMyShareVC.signInt1 = self.signInt
+      
+        let rsdSharedVC = RSDSharedMeViewController()
+        rsdSharedVC.signInt1 = self.signInt
+
+        let viewControllers:[UIViewController] = [rsdMyShareVC,rsdSharedVC]
         
         for vc in viewControllers{
             self.addChildViewController(vc)
@@ -37,6 +43,21 @@ class RSDequimentShareVC: UIViewController {
         if pageView.titleView.currentIndex == 0 {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: self.navRightBtn)
         }
+    }
+    
+    @objc func showOrHideNavRightBtn(_ nofi: Notification) {
+        //        self.mainTableView.reloadData()
+        let dict = nofi.userInfo
+        let index = dict!["currentIndex"] as! Int
+        if index == 0 {
+            self.creatNav()
+        } else {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: UIView())
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     lazy var navRightBtn: UIButton = {

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class RSDMySharedCell: UITableViewCell {
     private var leftImgView: UIImageView
@@ -79,6 +80,44 @@ class RSDMySharedCell: UITableViewCell {
 //            make.top.equalTo(titleDetailLabel002.snp.bottom).offset(5)
             make.bottom.equalToSuperview().offset(-5)
             make.width.height.equalTo(22)
+        }
+    }
+    
+    func showScaneListCell(model: RSDScaneMySharedModel, subArraysss: Array<Any>) {
+        model.picurl = KEY_STING.getSuccessResultWithOldString(OldString: model.picurl ?? "")
+        var newUrlString: String = ""
+        if !model.picurl!.contains("http") {
+            newUrlString = RSDBaseUrl_Real + model.picurl!
+        } else {
+            newUrlString = model.picurl!
+        }
+        let url = URL(string: newUrlString)
+        leftImgView.kf.setImage(with: ImageResource(downloadURL: url!), placeholder: UIImage(named: "myhead"), options: nil, progressBlock: nil, completionHandler: nil)
+
+        titleLabel.text =  model.sceneName
+        let subArray: [Any] = subArraysss.first as! Array
+        
+        let subDic1: [String: Any] = subArray.first as! Dictionary
+        let phoneStr1 = subDic1["loginname"] as! String
+        titleDetailLabel001.text = "分享给了：" + phoneStr1
+        
+        if subArray.count == 1 {
+            titleDetailLabel002.isHidden = true
+            downArrowImgView.isHidden = true
+        } else if subArray.count == 2 {
+            let subDic2: [String: Any] = subArray[1]  as! Dictionary
+            let phoneStr2 = subDic2["loginname"] as! String
+            titleDetailLabel002.text = "分享给了：" + phoneStr2
+            
+            titleDetailLabel002.isHidden = false
+            downArrowImgView.isHidden = true
+        } else if subArray.count > 2 {
+            downArrowImgView.isHidden = false
+            titleDetailLabel002.isHidden = false
+            
+            let subDic2: [String: Any] = subArray[1]  as! Dictionary
+            let phoneStr2 = subDic2["loginname"] as! String
+            titleDetailLabel002.text = "分享给了：" + phoneStr2
         }
     }
     

@@ -10,11 +10,12 @@ import UIKit
 import SVProgressHUD
 
 protocol RSDEditFuncConfigurationDelegate: AnyObject {
-    func changeDataDic(dateBegin: String, dateEnd: String, timeBegin: String, timeEnd: String, repeatStr: String, accorPrame: [String: Any])
+    func changeDataDic(dateBegin: String, dateEnd: String, timeBegin: String, timeEnd: String, repeatStr: String, accorPrame: [String: Any], repeatInts: Int)
 }
 
 class RSDFuncConfigurationVC: UIViewController {
 
+    var signInt3 = 0
     weak var delegate: RSDEditFuncConfigurationDelegate?
     
     var isEditBool: Bool = false
@@ -31,7 +32,10 @@ class RSDFuncConfigurationVC: UIViewController {
     private var timeBeginStr: String = ""
     private var timeEndStr: String = ""
     private var repeatDayStr: String = ""
-
+  
+    private var weekDayInt = 0 // 仅传参需要
+    
+    
     var editPickerView: RSDChooseAuthorityPickerView?//这个不能自定义 UI实在是太丑了 而且耗内存 加载速度太慢了 即使放在Didapper里面 也不理想 没办法只能用RSDChooseDateView代替重写了
     
     var editTimeView: RSDChooseTimeView?//时间选择的view
@@ -228,7 +232,7 @@ class RSDFuncConfigurationVC: UIViewController {
 //        dataModel?.timebegin = timeBeginStr
 //        dataModel?.timeend = timeEndStr
 //        dataModel?.accessPermission = permissionDic
-        self.delegate?.changeDataDic(dateBegin: dateBeginStr, dateEnd: dateEndStr, timeBegin: timeBeginStr, timeEnd: timeEndStr, repeatStr: repeatDayStr, accorPrame: permissionDic)
+        self.delegate?.changeDataDic(dateBegin: dateBeginStr, dateEnd: dateEndStr, timeBegin: timeBeginStr, timeEnd: timeEndStr, repeatStr: repeatDayStr, accorPrame: permissionDic, repeatInts: self.weekDayInt)
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -261,8 +265,10 @@ class RSDFuncConfigurationVC: UIViewController {
 
 //MARK: - 扩展
 extension RSDFuncConfigurationVC: UITableViewDelegate, UITableViewDataSource, RSDChooseAuthorityPickerViewDelegate, RSDChooseTimePickerDelegate, RSDChooseDatePickerDelegate, RSDSetRepeatDeleagte {
+    
     //MARK: - RSDSetRepeatDeleagte
-    func setRepeatDay(repeatStr: String, currentStateArray: [String]) {
+    func setRepeatDay(repeatStr: String, currentStateArray: [String], weekDayInt: Int) {
+        self.weekDayInt = weekDayInt
         let indexPath = IndexPath.init(row: 2, section: 0)
         self.mainTableView.reloadRows(at: [indexPath], with: .automatic)
         let cell: UITableViewCell = self.mainTableView.cellForRow(at: indexPath)!

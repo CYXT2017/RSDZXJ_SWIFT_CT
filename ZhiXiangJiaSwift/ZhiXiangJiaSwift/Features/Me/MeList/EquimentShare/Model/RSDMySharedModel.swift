@@ -47,9 +47,6 @@ class RSDMySharedModel: RSDDevicesModel {
     
     //获取权限页面数据 
     func getFuncConfilgDataModelWithDic(mainDic: [String: Any]) -> String {
-//        if !(mainDic["datebegin"] is NSNull) {
-//            self.datebegin  =  as! String
-//        }
         self.model = KEY_STING.getSuccessResultWithOldString(OldString: mainDic["model"] ?? "")
         self.device = KEY_STING.getSuccessResultWithOldString(OldString: mainDic["device"] ?? "")
         self.datebegin = KEY_STING.getSuccessResultWithOldString(OldString: mainDic["datebegin"] ?? "")
@@ -72,7 +69,9 @@ class RSDMySharedModel: RSDDevicesModel {
                 if offSet == 7 {
                     offSet = 0
                 }
-                let dayValue:CUnsignedChar = (CUnsignedChar(tempInt! & (0x01 << offSet)))
+                let hah = (0x01 << offSet) //这个是左右运算符 0x01表示1 可以看成2的倍数2 4 8 16 32 64
+                let jiji = tempInt! & hah  //按位与运算 &是逻辑相与运算；^是逻辑异或运算；~是逻辑同或运算。转化成二进制之后
+                let dayValue:CUnsignedChar = (CUnsignedChar(jiji))
                 if dayValue > 0 {
                     var  dayStr = ""
                     switch (offSet) {

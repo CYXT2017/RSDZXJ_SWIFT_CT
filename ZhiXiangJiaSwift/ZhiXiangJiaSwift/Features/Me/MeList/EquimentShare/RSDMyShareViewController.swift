@@ -13,6 +13,7 @@ class RSDMyShareViewController: UIViewController {
     private var mySharedArray: [Any]
     private var mySharedSubArray: [Any]
     private var deletIndex: Int = 0
+    var signInt1 = 0
 
     //MARK: - LifeCycle
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
@@ -38,24 +39,38 @@ class RSDMyShareViewController: UIViewController {
         parme["token"] = RSDUserLoginModel.users.token
         SVProgressHUD.show()
         weak var weakSelf = self
-        RSDNetWorkManager.shared.request(RSDPeosonalCenterApi.getMySharedDeviceListData(parme), success: { (reslut) in
+        var ttt = RSDPeosonalCenterApi.getMySharedDeviceListData(parme)
+        if self.signInt1 == 1 {
+            ttt = RSDPeosonalCenterApi.getScaneMySharedListData(parme)
+        }
+        RSDNetWorkManager.shared.request(ttt, success: { (reslut) in
             SVProgressHUD.dismiss()
             DispatchQueue.global().async {
                 print(reslut)
                 print(dataToDictionary(data: reslut) ?? "")
                 let dic: NSDictionary = dataToDictionary(data: reslut)! as NSDictionary
                 let codeStr = dic["code"] as! String
-                if (codeStr == "0008") {
-                    SVProgressHUD.showError(withStatus: "访问过期")
+                if (codeStr != "0000") {
+                    SVProgressHUD.showError(withStatus: dic["msg"] as? String)
                     return
                 }
                 let tempArray: NSArray = dic.object(forKey: "resultlist") as! NSArray
-                for dic in tempArray {
-                    let model: RSDMySharedModel = RSDMySharedModel()
-                    let tempArr: [Any] = model.getSubArrayWithDic(dic: dic as! NSDictionary) as! [Any]
-                    weakSelf?.mySharedSubArray.append(tempArr)
-                    model.getModelDataWithDic(dic: dic as! NSDictionary)
-                    weakSelf?.mySharedArray.append(model)
+                if self.signInt1 == 1 {
+                    for i in 0 ..< tempArray.count {
+                        let model: RSDScaneMySharedModel = RSDScaneMySharedModel()
+                        let tempArr: [Any] = model.getScraneSubArrayWithDic(dic: (tempArray[i] as? [String: Any])! ) as! [Any]
+                        weakSelf?.mySharedSubArray.append(tempArr)
+                        model.getScraneModelDataWithDic(mainDic: tempArray[i] as! [String: Any])
+                        weakSelf?.mySharedArray.append(model)
+                    }
+                } else {
+                    for dic in tempArray {
+                        let model: RSDMySharedModel = RSDMySharedModel()
+                        let tempArr: [Any] = model.getSubArrayWithDic(dic: dic as! NSDictionary) as! [Any]
+                        weakSelf?.mySharedSubArray.append(tempArr)
+                        model.getModelDataWithDic(dic: dic as! NSDictionary)
+                        weakSelf?.mySharedArray.append(model)
+                    }
                 }
                 DispatchQueue.main.async {
                     weakSelf?.mainTableView.reloadData()
@@ -70,6 +85,16 @@ class RSDMyShareViewController: UIViewController {
     
     private func setUpUI() {
         view.addSubview(self.mainTableView)
+        self.mainTableView.snp.makeConstraints { (make) in
+            make.top.left.right.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-64)
+        }
+//        if #available(iOS 11.0, *) {
+//            self.mainTableView.contentInsetAdjustmentBehavior = .never
+//        } else {
+//            self.automaticallyAdjustsScrollViewInsets = false
+//        };
+
         self.mainTableView.backgroundColor = RSDBGViewColor
         self.mainTableView.tableFooterView = UIView()
         self.mainTableView.register(RSDMySharedCell.classForCoder(), forCellReuseIdentifier: "mySharedCell")
@@ -78,24 +103,38 @@ class RSDMyShareViewController: UIViewController {
     
     private func deletShareDevice() {
         print("删除----\(deletIndex)" )
+        var parm: [String: Any] = Dictionary.init()
+        var ttt = RSDPeosonalCenterApi.deleMyShareDeviceData(parm)
         let tempArr: [Any] = [self.mySharedSubArray[deletIndex]]
         let subArray: [Any] = tempArr.first as! Array
         var phoneArr: [Any] = Array.init()
         for subDic in subArray {
-            let phoneStr = (subDic as! [String: Any])["phone"] as! String
-            phoneArr.append(phoneStr)
+            if self.signInt1 == 0 {
+                let phoneStr = (subDic as! [String: Any])["phone"] as! String
+                phoneArr.append(phoneStr)
+            } else {
+                let userId = (subDic as! [String: Any])["id"] as! Int
+                let idString = "\(userId)"
+                phoneArr.append(idString)
+            }
         }
-        
-        let model: RSDMySharedModel = self.mySharedArray[deletIndex] as! RSDMySharedModel
-        let deviceID = model.device_id
-       
-        var parm: [String: Any] = Dictionary.init()
-        parm["deviceid"] = deviceID
-        parm["phonelist"] = phoneArr
-//        parm["token"] = RSDUserLoginModel.users.token
+        if self.signInt1 == 1 {
+            ttt = RSDPeosonalCenterApi.deletMyShareScaneListData(parm)
+            let model: RSDScaneMySharedModel = self.mySharedArray[deletIndex] as! RSDScaneMySharedModel
+            var parm: [String: Any] = Dictionary.init()
+            parm["customerIds"] = phoneArr
+            parm["sceneId"] = model.sceneId
+            parm["token"] = RSDUserLoginModel.users.token
+        } else {
+            let model: RSDMySharedModel = self.mySharedArray[deletIndex] as! RSDMySharedModel
+            let deviceID = model.device_id
+            parm["deviceid"] = deviceID
+            parm["phonelist"] = phoneArr
+            //        parm["token"] = RSDUserLoginModel.users.token
+        }
         weak var weakSelf = self
         SVProgressHUD.show(withStatus: "取消分享中...")
- RSDNetWorkManager.shared.request(RSDPeosonalCenterApi.deleMyShareDeviceData(parm),success: { (reslut) in
+ RSDNetWorkManager.shared.request(ttt,success: { (reslut) in
             print(reslut)
             print(dataToDictionary(data: reslut) ?? "")
             let dic: NSDictionary = dataToDictionary(data: reslut)! as NSDictionary
@@ -122,7 +161,7 @@ class RSDMyShareViewController: UIViewController {
     }
     
     lazy var mainTableView: UITableView = {
-       let tableview = UITableView.init(frame: CGRect(x: 0, y: 0, width: RSDScreenWidth, height: view.height), style: .plain)
+       let tableview = UITableView.init(frame: CGRect(x: 0, y: 0, width: RSDScreenWidth, height: self.view.height), style: .plain)
         tableview.delegate = self
         tableview.dataSource = self
         tableview.separatorStyle = .none
@@ -148,8 +187,14 @@ extension RSDMyShareViewController: UITableViewDelegate, UITableViewDataSource {
             cell = RSDMySharedCell.init(style: .default, reuseIdentifier: "mySharedCell")
         }
         if self.mySharedArray.count != 0 {
-            let model: RSDMySharedModel = self.mySharedArray[indexPath.section] as! RSDMySharedModel
-            cell.updateTab(model: model, subArraysss: [self.mySharedSubArray[indexPath.section]])
+            if self.signInt1 == 1 {
+                let model: RSDScaneMySharedModel = self.mySharedArray[indexPath.section] as! RSDScaneMySharedModel
+                cell.showScaneListCell(model: model, subArraysss: [self.mySharedSubArray[indexPath.section]])
+            } else {
+                let model: RSDMySharedModel = self.mySharedArray[indexPath.section] as! RSDMySharedModel
+                cell.updateTab(model: model, subArraysss: [self.mySharedSubArray[indexPath.section]])
+            }
+            
         }
         return cell
     }
@@ -158,6 +203,9 @@ extension RSDMyShareViewController: UITableViewDelegate, UITableViewDataSource {
         if section == 0 {
             return 10
         }
+//        else if section == self.mySharedArray.count - 1 {
+//            return
+//        }
         return 0
     }
     
@@ -195,7 +243,13 @@ extension RSDMyShareViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             deletIndex = indexPath.section
-            let alertController = UIAlertController.init(title: "提示", message: "确定取消对该设备的分享吗", preferredStyle: .alert)
+            var titleString = ""
+            if self.signInt1 == 1 {
+                titleString = "确定取消对该场景的分享吗"
+            } else {
+                titleString = "确定取消对该设备的分享吗"
+            }
+            let alertController = UIAlertController.init(title: "提示", message: titleString, preferredStyle: .alert)
             alertController.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))
             alertController.addAction(UIAlertAction.init(title: "确定", style: .default, handler: { (action) in
                 self.deletShareDevice()
@@ -207,14 +261,22 @@ extension RSDMyShareViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let cell: RSDMySharedCell = tableView.cellForRow(at: indexPath) as! RSDMySharedCell
-        let model: RSDMySharedModel = self.mySharedArray[deletIndex] as! RSDMySharedModel
         let listVC = RSDMyShareDetailListVC()
-        let tempArr: [Any] = [self.mySharedSubArray[indexPath.section]]
-        let subArray: [Any] = tempArr.first as! Array
-        listVC.listDataArray = subArray
-        listVC.deviceId = model.device_id!
+        if self.signInt1 == 1 {
+            let model: RSDScaneMySharedModel = self.mySharedArray[deletIndex] as! RSDScaneMySharedModel
+            let tempArr: [Any] = [self.mySharedSubArray[indexPath.section]]
+            let subArray: [Any] = tempArr.first as! Array
+            listVC.listDataArray = subArray
+            listVC.scraneID = model.sceneId!
+        } else {
+            let model: RSDMySharedModel = self.mySharedArray[deletIndex] as! RSDMySharedModel
+            let tempArr: [Any] = [self.mySharedSubArray[indexPath.section]]
+            let subArray: [Any] = tempArr.first as! Array
+            listVC.listDataArray = subArray
+            listVC.deviceId = model.device_id!
+        }
+        listVC.signInt2 = self.signInt1
         listVC.title = cell.titleLabel.text
-        
         self.navigationController?.pushViewController(listVC, animated: true)
     }
     

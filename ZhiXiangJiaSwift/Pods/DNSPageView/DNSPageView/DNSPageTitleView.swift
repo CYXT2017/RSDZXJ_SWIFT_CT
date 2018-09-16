@@ -26,12 +26,15 @@
 
 import UIKit
 
+
 @objc public protocol DNSPageTitleViewDelegate: class {
 
     /// pageContentView的刷新代理
     @objc optional var reloader: DNSPageReloadable? { get }
-    
+
+
     func titleView(_ titleView: DNSPageTitleView, currentIndex: Int)
+    
 }
 
 /// 如果contentView中的view需要实现某些刷新的方法，请让对应的childViewController遵守这个协议
@@ -259,7 +262,7 @@ extension DNSPageTitleView {
         adjustLabelPosition(targetLabel)
         
         delegate?.titleView(self, currentIndex: currentIndex)
-        
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue:"getCurrentIndexNotif"), object: self, userInfo: ["currentIndex": currentIndex])
 
         if style.isScaleEnable {
             UIView.animate(withDuration: 0.25, animations: {

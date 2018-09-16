@@ -10,11 +10,13 @@ import UIKit
 import SVProgressHUD
 
 class RSDMyShareDetailListVC: UIViewController {
+    var signInt2 = 0
 
     var listDataArray: [Any]?
     private var deletIndex: Int = 0
     var deviceId: String = ""
-    
+    var scraneID: String = ""
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
@@ -33,16 +35,28 @@ class RSDMyShareDetailListVC: UIViewController {
     }
     private func deletShareDevice() {
         let subDic: [String: Any] =  self.listDataArray![deletIndex]  as! Dictionary
-        let phoneStr = subDic["phone"] as! String
+        var phoneStr = ""
         var phoneArr: [Any] = Array.init()
-        phoneArr.append(phoneStr)
         var parm: [String: Any] = Dictionary.init()
-        parm["deviceid"] = self.deviceId
+        if self.signInt2 == 1 {
+            phoneStr = subDic["loginname"] as! String
+            parm["sceneId"] = self.scraneID
+        } else {
+            phoneStr = subDic["phone"] as! String
+            parm["deviceid"] = self.deviceId
+        }
+        phoneArr.append(phoneStr)
         parm["phonelist"] = phoneArr
+
         //        parm["token"] = RSDUserLoginModel.users.token
         weak var weakSelf = self
         SVProgressHUD.show(withStatus: "取消分享中...")
-        RSDNetWorkManager.shared.request(RSDPeosonalCenterApi.deleMyShareDeviceData(parm),success: { (reslut) in
+        var ttt = RSDPeosonalCenterApi.deleMyShareDeviceData(parm)
+        if self.signInt2 == 1 {
+            ttt = RSDPeosonalCenterApi.deletMyShareScaneListData(parm)
+        }
+
+        RSDNetWorkManager.shared.request(ttt,success: { (reslut) in
             print(reslut)
             print(dataToDictionary(data: reslut) ?? "")
             let dic: NSDictionary = dataToDictionary(data: reslut)! as NSDictionary
@@ -89,7 +103,12 @@ extension RSDMyShareDetailListVC: UITableViewDelegate, UITableViewDataSource {
         }
         if self.listDataArray?.count != 0 {
             let subDic: [String: Any] =  self.listDataArray![indexPath.section]  as! Dictionary
-            let phoneStr = subDic["phone"] as! String
+            var phoneStr = ""
+            if self.signInt2 == 1 {
+                phoneStr = subDic["loginname"] as! String
+            } else {
+                phoneStr = subDic["phone"] as! String
+            }
             cell.textLabel?.text = "分享给了: " +  phoneStr
         }
         cell.textLabel?.font = UIFont.systemFont(ofSize: 15)
@@ -123,7 +142,12 @@ extension RSDMyShareDetailListVC: UITableViewDelegate, UITableViewDataSource {
         if editingStyle == .delete {
             deletIndex = indexPath.section
             let subDic: [String: Any] =  self.listDataArray![deletIndex]  as! Dictionary
-            let phoneStr = subDic["phone"] as! String
+            var phoneStr = ""
+            if self.signInt2 == 1 {
+                phoneStr = subDic["loginname"] as! String
+            } else {
+                phoneStr = subDic["phone"] as! String
+            }
             let msgStr = "确定取消对" + phoneStr + "的分享吗？"
             let alertController = UIAlertController.init(title: "提示", message: msgStr, preferredStyle: .alert)
             alertController.addAction(UIAlertAction.init(title: "取消", style: .cancel, handler: nil))
@@ -137,6 +161,9 @@ extension RSDMyShareDetailListVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        if self.signInt2 == 1 {
+            return
+        }
         let FuncConfigurationVC = RSDFuncConfigurationVC()
         FuncConfigurationVC.dataDic = self.listDataArray?[indexPath.section] as? [String : Any]
         self.navigationController?.pushViewController(FuncConfigurationVC, animated: true)

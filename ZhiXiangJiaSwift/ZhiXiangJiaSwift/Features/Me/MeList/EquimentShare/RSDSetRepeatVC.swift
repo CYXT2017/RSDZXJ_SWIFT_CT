@@ -12,7 +12,7 @@ import SVProgressHUD
 
 protocol RSDSetRepeatDeleagte: AnyObject {
 
-    func setRepeatDay(repeatStr: String, currentStateArray: [String])
+    func setRepeatDay(repeatStr: String, currentStateArray: [String], weekDayInt: Int)
 }
 
 class RSDSetRepeatVC: UIViewController {
@@ -21,7 +21,8 @@ class RSDSetRepeatVC: UIViewController {
     
     let titleArray: [String] = ["周一","周二","周三","周四","周五","周六","周日"]
     var stateArray: [String] = Array.init()
-
+    var repeatInt = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.white
@@ -85,7 +86,7 @@ class RSDSetRepeatVC: UIViewController {
                 setingString = setingString + setArray[i]
             }
         }
-        self.delegate?.setRepeatDay(repeatStr: setingString, currentStateArray: self.stateArray)
+        self.delegate?.setRepeatDay(repeatStr: setingString, currentStateArray: self.stateArray, weekDayInt: self.repeatInt)
         self.navigationController?.popViewController(animated: true)
     }
 
@@ -139,6 +140,16 @@ extension RSDSetRepeatVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        var offset = indexPath.row + 1;
+        if (offset == 7) {// 周日特殊处理
+            offset = 0;
+        }
+        if ((self.repeatInt & (0x01 << offset)) > 0) {
+            self.repeatInt -= (0x01 << offset);
+        } else {
+            self.repeatInt += (0x01 << offset);
+        }
+        
         if self.stateArray[indexPath.row] == "1" {
             self.stateArray[indexPath.row] = "0"
         } else {

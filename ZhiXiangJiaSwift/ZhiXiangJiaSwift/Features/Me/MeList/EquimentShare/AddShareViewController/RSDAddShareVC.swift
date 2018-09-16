@@ -309,15 +309,16 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
         cell.accessoryType = .disclosureIndicator
         return cell
     }
- 
+         
     
-    func changeDataDic(dateBegin: String, dateEnd: String, timeBegin: String, timeEnd: String, repeatStr: String, accorPrame: [String : Any]) {
+    func changeDataDic(dateBegin: String, dateEnd: String, timeBegin: String, timeEnd: String, repeatStr: String, accorPrame: [String : Any], repeatInts: Int) {
         var subDic: [String: Any] =  self.addShareEquimentArray[currentIndex]  as! Dictionary
         subDic["timebegin"] = timeBegin
         subDic["timeend"] = timeEnd
         subDic["datebegin"] = dateBegin
         subDic["dateend"] = dateEnd
-        subDic["weekvalid"] = repeatStr
+        //        subDic["weekvalid"] = repeatStr
+        subDic["weekvalid"] = repeatInts
         subDic["accessPermission"] = accorPrame
     }
     
