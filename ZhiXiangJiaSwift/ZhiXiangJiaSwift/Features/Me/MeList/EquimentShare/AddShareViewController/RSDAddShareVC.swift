@@ -8,8 +8,10 @@
 
 import UIKit
 import SVProgressHUD
+import Kingfisher
 
 class RSDAddShareVC: UIViewController {
+    var signInt3 = 0
     private var addShareEquimentArray: [Any] = Array.init()
 
     var needToVerifySecurityCodeBool = false
@@ -193,7 +195,11 @@ class RSDAddShareVC: UIViewController {
     //分享设备
     @objc  private  func shareBtnClick() {
         if self.addShareEquimentArray.count == 0 {
-            SVProgressHUD.showError(withStatus: "请添加分享设备")
+            if self.signInt3 == 1 {
+                SVProgressHUD.showError(withStatus: "请添加分享场景")
+            } else {
+                SVProgressHUD.showError(withStatus: "请添加分享设备")
+            }
             return
         }
         let zhenzeStr = "^1(3[0-9]|4[579]|5[0-35-9]|7[0135-8]|8[0-9]|9[89]|6[6])\\d{8}$"
@@ -206,45 +212,63 @@ class RSDAddShareVC: UIViewController {
             return
         }
         DispatchQueue.global(qos: .default).async {
-            
-            for i in 0..<self.addShareEquimentArray.count {
-                let subDic: [String: Any] =  self.addShareEquimentArray[i]  as! Dictionary
-                let deviceType = subDic["device"] as! String
-                if deviceType == RSD_EQUIPMENT_TYPE_ZIGBEE_DOORLOCK || deviceType == RSD_EQUIPMENT_TYPE_NB_DOORLOCK {
-                    self.needToVerifySecurityCodeBool = true;
-                    break;
+            if self.signInt3 == 0 {
+                for i in 0..<self.addShareEquimentArray.count {
+                    let subDic: [String: Any] =  self.addShareEquimentArray[i]  as! Dictionary
+                    let deviceType = subDic["device"] as! String
+                    if deviceType == RSD_EQUIPMENT_TYPE_ZIGBEE_DOORLOCK || deviceType == RSD_EQUIPMENT_TYPE_NB_DOORLOCK {
+                        self.needToVerifySecurityCodeBool = true;
+                        break;
+                    }
+                }
+                
+                if self.needToVerifySecurityCodeBool {
+                    //验证门锁
+                    //FIXME: -这里面有东西没写完 待写
+                    RSDDevicesModel.init().getDoorLockModel().verifySecurityCodeMethod(mainVC: self, completion: { (reslutBool) in
+                        self.waitCount = self.waitCount + 1
+                        self.verifySuccessBool = reslutBool
+                    })
+                    while(self.waitCount <= 0) { sleep(1) }
+                    if !self.verifySuccessBool { return }
                 }
             }
-            
-            if self.needToVerifySecurityCodeBool {
-                //验证门锁
-                 //FIXME: -这里面有东西没写完 待写
-                RSDDevicesModel.init().getDoorLockModel().verifySecurityCodeMethod(mainVC: self, completion: { (reslutBool) in
-                    self.waitCount = self.waitCount + 1
-                    self.verifySuccessBool = reslutBool
-                })
-                while(self.waitCount <= 0) { sleep(1) }
-                if !self.verifySuccessBool { return }
-            }
+
+
             //操作完成，调用主线程来刷新界面
             DispatchQueue.main.async {
                 let userPhone = self.mainTextFieled.text
                 weak var weakSelf = self
                 SVProgressHUD.show(withStatus: "保存分享中...")
-                self.addMyShareDeviceMethod(deviceArray: self.addShareEquimentArray, shareUser: userPhone!, completion: { (success, errorMsg) in
-                    if success {
-                        if errorMsg.count == 0 {
-                            SVProgressHUD.showError(withStatus: "保存成功")
-                            weakSelf?.navigationController?.popViewController(animated: true)
-                             //FIXME: - 成功之后发通知 刷新界面
+                if self.signInt3 == 1 {
+                    self.addScraneDataMethod(shareUser: userPhone!, completion: { (success, errorMsg) in
+                        if success {
+                            if errorMsg.count == 0 {
+                                SVProgressHUD.showError(withStatus: "保存成功")
+                                weakSelf?.navigationController?.popViewController(animated: true)
+                                //FIXME: - 成功之后发通知 刷新界面
+                            } else {
+                                SVProgressHUD.showError(withStatus: errorMsg)
+                            }
                         } else {
                             SVProgressHUD.showError(withStatus: errorMsg)
                         }
-                    } else {
-                        SVProgressHUD.showError(withStatus: errorMsg)
-                    }
-                })
-
+                    })
+                } else {
+                    self.addMyShareDeviceMethod(deviceArray: self.addShareEquimentArray, shareUser: userPhone!, completion: { (success, errorMsg) in
+                        if success {
+                            if errorMsg.count == 0 {
+                                SVProgressHUD.showError(withStatus: "保存成功")
+                                weakSelf?.navigationController?.popViewController(animated: true)
+                                //FIXME: - 成功之后发通知 刷新界面
+                            } else {
+                                SVProgressHUD.showError(withStatus: errorMsg)
+                            }
+                        } else {
+                            SVProgressHUD.showError(withStatus: errorMsg)
+                        }
+                    })
+                }
             }
         }
         
@@ -261,6 +285,10 @@ class RSDAddShareVC: UIViewController {
         self.mainTextFieled.resignFirstResponder()
         let addVC = RSDAddDeviceAndScanListVC()
         addVC.title = "添加设备"
+        if self.signInt3 == 1 {
+            addVC.title = "添加场景"
+        }
+        addVC.signInt4 = self.signInt3
         addVC.delegates = self
         self.navigationController?.pushViewController(addVC, animated: true)
     }
@@ -293,12 +321,21 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
             cell = UITableViewCell.init(style: .default, reuseIdentifier: "mySharedCell")
         }
         if self.addShareEquimentArray.count != 0 {
-            let subDic: [String: Any] =  self.addShareEquimentArray[indexPath.row]  as! Dictionary
-            let phoneStr = subDic["deviceName"] as! String
-            cell.textLabel?.text = phoneStr
-            let typeString = subDic["device"] as! String
-            let modelString = subDic["model"] as! String
-            cell.imageView?.image = RSDEquipmentPubLicFun.shareInstance.getDeviceImage(type: typeString, model: modelString)
+            if self.signInt3 == 1 {
+                let dataModel: RSDScaneListModel =  self.addShareEquimentArray[indexPath.row]  as! RSDScaneListModel
+                cell.textLabel?.text = dataModel.name
+                let url: URL = KEY_STING.getSuccessIconImageUrl(oldString: dataModel.picurl!)
+                cell.imageView?.kf.setImage(with: ImageResource(downloadURL: url), placeholder: UIImage(named: "DefaultModeImage"), options: nil, progressBlock: nil, completionHandler: nil)
+                cell.accessoryType = .none
+            } else {
+                let subDic: [String: Any] =  self.addShareEquimentArray[indexPath.row]  as! Dictionary
+                let phoneStr = subDic["deviceName"] as! String
+                cell.textLabel?.text = phoneStr
+                let typeString = subDic["device"] as! String
+                let modelString = subDic["model"] as! String
+                cell.imageView?.image = RSDEquipmentPubLicFun.shareInstance.getDeviceImage(type: typeString, model: modelString)
+                cell.accessoryType = .disclosureIndicator
+            }
             if indexPath.row == self.addShareEquimentArray.count - 1 {
 //                self.hideLastCellLineView(lastSupView: cell.contentView)
 //                self.filerCellSeperateLine(cell: cell)
@@ -306,7 +343,6 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
             }
         }
         cell.textLabel?.font = UIFont.systemFont(ofSize: 15)
-        cell.accessoryType = .disclosureIndicator
         return cell
     }
          
@@ -325,6 +361,9 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        if self.signInt3 == 1 {
+            return;
+        }
         currentIndex = indexPath.row
         let FuncConfigurationVC = RSDFuncConfigurationVC()
         FuncConfigurationVC.isEditBool = true
@@ -377,11 +416,30 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
         }) { (error) in
             completion(false, error.localizedDescription)
         }
-        
     }
     
-    
-    
+    func  addScraneDataMethod(shareUser: String, completion: @escaping (_ resultBool: Bool, _ resultStr: String) -> ()) {
+        var arr: [Any] = Array.init()
+        for i in 0..<self.addShareEquimentArray.count {
+            let dataModel: RSDScaneListModel =  self.addShareEquimentArray[i]  as! RSDScaneListModel
+            arr.append(dataModel.id!)
+        }
+        var params: [String: Any] = Dictionary.init()
+        params["phone"] = shareUser
+        params["sceneIds"] = arr
+//        params["token"] = RSDUserLoginModel.users.token
+        RSDNetWorkManager.shared.request(RSDPeosonalCenterApi.addMyShareScaneListData(params), success: {(result) in
+            let dic: NSDictionary = dataToDictionary(data: result)! as NSDictionary
+            let  codeStr = dic["code"] as? String
+            if (codeStr == "0000") {
+                completion(true, "")
+            } else {
+                completion(false, (dic["msg"] as? String)!)
+            }
+        }) { (error) in
+            completion(false, error.localizedDescription)
+        }
+    }
 }
 
 

@@ -9,12 +9,15 @@
 
 import UIKit
 import SVProgressHUD
+import Kingfisher
 
 protocol AddDeviceAndScaneDelegate: NSObjectProtocol {
     func chooseDeviceAndScaneMethod(selectArray: [Any])
 }
 
 class RSDAddDeviceAndScanListVC: UIViewController {
+    var signInt4 = 0
+
     private var dataListArray: [Any] = Array.init()
     private var selectDataArray: [Any] = Array.init()
     private var btnStateArray: [String] = Array.init()
@@ -30,22 +33,34 @@ class RSDAddDeviceAndScanListVC: UIViewController {
     private func getShareData() {
         var parme: [String: Any] = Dictionary.init()
         parme["token"] = RSDUserLoginModel.users.token
+        var ttt = RSDPeosonalCenterApi.getUserEquimentListData(parme)
+        if self.signInt4 == 1 {
+            ttt = RSDPeosonalCenterApi.getUserInteligentScaneListData(parme)
+        }
         weak var weakSelf = self
-        RSDNetWorkManager.shared.request(RSDPeosonalCenterApi.getUserEquimentListData(parme), success: { (response) in
+        RSDNetWorkManager.shared.request(ttt, success: { (response) in
             //            let jsonDic = JSON(response)
             let dic: NSDictionary = dataToDictionary(data: response)! as NSDictionary
             let  codeStr = dic["code"] as? String
             if (codeStr == "0000") {
                 let tempArray: [Any] = dic["resultlist"] as! [Any]
                 for item in tempArray {
-                    let deviceModel = RSDDevicesModel.init()
-                    deviceModel.getDeviceModelWithDic(dic: item as! [String : Any])
-                    if deviceModel.device == RSD_EQUIPMENT_TYPE_WIFI_SCENESWITCH || deviceModel.device == RSD_EQUIPMENT_TYPE_WIFI_VOICEHOME || (deviceModel.device == RSD_EQUIPMENT_TYPE_433_CIRCLESWITCH_NO_POWER && deviceModel.model == RSD_CIRCLESWITCH_NO_POWER_TYPE_433_A2) || deviceModel.device == RSD_EQUIPMENT_TYPE_433_EMITTER_NO_POWER || (deviceModel.device == RSD_EQUIPMENT_TYPE_433_CIRCLESWITCH_NO_POWER && deviceModel.model == RSD_CIRCLESWITCH_NO_POWER_TYPE_433_A4) {
-                        continue
-                    }
-                    //FIXME: - 这里条件筛选不全 可能有问题 以后再说
-                    if deviceModel.mainSubType == 1 {
-                        weakSelf?.dataListArray.append(item)
+                    if self.signInt4 == 1 {
+                        let scaneModel = RSDScaneListModel.init()
+                        scaneModel.getUserScaneListModel(mainDic: item as! [String: Any])
+                        if RSDUserLoginModel.users.id == scaneModel.owner! {
+                            weakSelf?.dataListArray.append(scaneModel)
+                        }
+                    } else {
+                        let deviceModel = RSDDevicesModel.init()
+                        deviceModel.getDeviceModelWithDic(dic: item as! [String : Any])
+                        if deviceModel.device == RSD_EQUIPMENT_TYPE_WIFI_SCENESWITCH || deviceModel.device == RSD_EQUIPMENT_TYPE_WIFI_VOICEHOME || (deviceModel.device == RSD_EQUIPMENT_TYPE_433_CIRCLESWITCH_NO_POWER && deviceModel.model == RSD_CIRCLESWITCH_NO_POWER_TYPE_433_A2) || deviceModel.device == RSD_EQUIPMENT_TYPE_433_EMITTER_NO_POWER || (deviceModel.device == RSD_EQUIPMENT_TYPE_433_CIRCLESWITCH_NO_POWER && deviceModel.model == RSD_CIRCLESWITCH_NO_POWER_TYPE_433_A4) {
+                            continue
+                        }
+                        //FIXME: - 这里条件筛选不全 可能有问题 以后再说
+                        if deviceModel.mainSubType == 1 {
+                            weakSelf?.dataListArray.append(item)
+                        }
                     }
                 }
                 if weakSelf?.dataListArray.count != 0 {
@@ -74,7 +89,7 @@ class RSDAddDeviceAndScanListVC: UIViewController {
         view.addSubview(bottomBtnView)
         bottomBtnView.snp.makeConstraints { (make) in
             make.left.bottom.right.equalToSuperview()
-            make.height.equalTo(60)
+            make.height.equalTo(70)
         }
         
         bottomBtnView.addSubview(self.addDeviceBtn)
@@ -98,6 +113,9 @@ class RSDAddDeviceAndScanListVC: UIViewController {
     lazy var addDeviceBtn: UIButton = {
         let btn = UIButton.init()
         btn.setTitle("添加设备", for: .normal)
+        if self.signInt4 == 1 {
+            btn.setTitle("添加场景", for: .normal)
+        }
         btn.setTitleColor(UIColor.white, for: .normal)
         btn.backgroundColor = UIColor.navBackGroundColor
         btn.clipsToBounds = true
@@ -208,19 +226,25 @@ extension RSDAddDeviceAndScanListVC: UITextFieldDelegate, UITableViewDelegate, U
         showAddBtn.tag = 999 + indexPath.row
 
         if self.dataListArray.count != 0 {
-            let subDic: [String: Any] =  self.dataListArray[indexPath.row]  as! Dictionary
-            let phoneStr = subDic["deviceName"] as! String
-            let typeString = subDic["device"] as! String
-            let modelString = subDic["model"] as! String
-            cell.imageView?.image = RSDEquipmentPubLicFun.shareInstance.getDeviceImage(type: typeString, model: modelString)
-            cell.textLabel?.text = phoneStr
+            if self.signInt4 == 1 {
+                let scaneModel: RSDScaneListModel = self.dataListArray[indexPath.row]  as! RSDScaneListModel
+                let url: URL = KEY_STING.getSuccessIconImageUrl(oldString: scaneModel.picurl!)
+                cell.imageView?.kf.setImage(with: ImageResource(downloadURL: url), placeholder: UIImage(named: "DefaultModeImage"), options: nil, progressBlock: nil, completionHandler: nil)
+                cell.textLabel?.text = scaneModel.name
+            } else {
+                let subDic: [String: Any] = self.dataListArray[indexPath.row]  as! Dictionary
+                let phoneStr = subDic["deviceName"] as! String
+                let typeString = subDic["device"] as! String
+                let modelString = subDic["model"] as! String
+                cell.imageView?.image = RSDEquipmentPubLicFun.shareInstance.getDeviceImage(type: typeString, model: modelString)
+                cell.textLabel?.text = phoneStr
+            }
             if self.btnStateArray[indexPath.row] == "0" {
                 showAddBtn.isSelected = false
             } else {
                 showAddBtn.isSelected = true
             }
         }
-//        cell.accessoryType = .disclosureIndicator
         return cell
     }
     
@@ -236,13 +260,6 @@ extension RSDAddDeviceAndScanListVC: UITextFieldDelegate, UITableViewDelegate, U
             self.btnStateArray[btnIndex] = "0"
             addBtn.isSelected = false
         }
-//        if addBtn.isSelected {
-//            addBtn.isSelected = false
-//            self.btnStateArray.replaceSubrange(Range(btnIndex..<btnIndex + 1), with: ["0"])
-//        } else {
-//            addBtn.isSelected = true
-//            self.btnStateArray.replaceSubrange(Range(btnIndex..<btnIndex + 1), with: ["1"])
-//        }
         self.checkDeviceIsAllChoose()
     }
     

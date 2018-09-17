@@ -4,7 +4,7 @@
 //
 //  Created by ios on 2018/8/30.
 //  Copyright © 2018年 rsdznjj. All rights reserved.
-//
+// 
 
 import UIKit
 import DNSPageView
@@ -74,6 +74,7 @@ class RSDequimentShareVC: UIViewController {
     @objc  private  func addDoing() {
         let addVC = RSDAddShareVC()
         addVC.title = "添加分享"
+        addVC.signInt3 = self.signInt
 //        addVC.view.backgroundColor = UIColor.white*****假的一比 这个比居然是罪魁祸首 去除导航栏底部的线条
         self.navigationController?.pushViewController(addVC, animated: true)
     }

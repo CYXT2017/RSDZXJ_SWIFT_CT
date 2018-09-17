@@ -1,7 +1,5 @@
 
-*.swift
 *.xcworkspacedata
-*.plist
 *.xcuserstate
 *.xcscheme
 ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/.DS_Store

@@ -16,7 +16,7 @@ class RSDSceneModel: Codable {
     var createtime = ""
     var imageUrl = ""
     var creater = 0
-    var owner = 0
+//    var owner = ""
     var timebegin = ""
     var sceneConditionArray:[condition] = []
     var doflag = 0
@@ -46,7 +46,7 @@ class RSDSceneModel: Codable {
         case createtime
         case imageUrl = "picurl"
         case creater
-        case owner
+//        case owner
         case timebegin
         case doflag
         case datebeg

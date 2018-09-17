@@ -47,12 +47,12 @@ class RSDMySharedModel: RSDDevicesModel {
     
     //获取权限页面数据 
     func getFuncConfilgDataModelWithDic(mainDic: [String: Any]) -> String {
-        self.model = KEY_STING.getSuccessResultWithOldString(OldString: mainDic["model"] ?? "")
-        self.device = KEY_STING.getSuccessResultWithOldString(OldString: mainDic["device"] ?? "")
-        self.datebegin = KEY_STING.getSuccessResultWithOldString(OldString: mainDic["datebegin"] ?? "")
-        self.dateend = KEY_STING.getSuccessResultWithOldString(OldString: mainDic["dateend"] ?? "")
-        self.timeend = KEY_STING.getSuccessResultWithOldString(OldString: mainDic["timeend"] ?? "")
-        self.timebegin = KEY_STING.getSuccessResultWithOldString(OldString: mainDic["timebegin"] ?? "")
+        self.model = KEY_STING.getServiceEmptyString(OldString: mainDic["model"] ?? "")
+        self.device = KEY_STING.getServiceEmptyString(OldString: mainDic["device"] ?? "")
+        self.datebegin = KEY_STING.getServiceEmptyString(OldString: mainDic["datebegin"] ?? "")
+        self.dateend = KEY_STING.getServiceEmptyString(OldString: mainDic["dateend"] ?? "")
+        self.timeend = KEY_STING.getServiceEmptyString(OldString: mainDic["timeend"] ?? "")
+        self.timebegin = KEY_STING.getServiceEmptyString(OldString: mainDic["timebegin"] ?? "")
         self.weekvalid = mainDic["weekvalid"] as? Int
         let tempInt = self.weekvalid
         var tempStr = ""

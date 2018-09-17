@@ -12,7 +12,7 @@ import Foundation
 
 extension String {
     
-    func getSuccessResultWithOldString(OldString: Any) -> String {
+    func getServiceEmptyString(OldString: Any) -> String {
         var newString = ""
         if  OldString is NSNull {
             return newString
@@ -20,6 +20,16 @@ extension String {
         newString = (OldString as? String)!
         return newString
     }
+    
+    func getSuccessIconImageUrl(oldString: String) -> URL {
+        var newUrlString: String = KEY_STING.getServiceEmptyString(OldString: oldString)
+        if !newUrlString.contains("http") {
+            newUrlString = RSDBaseUrl_Real + newUrlString
+        }
+        let url = URL(string: newUrlString)
+        return url!
+    }
+    
     
     
 }

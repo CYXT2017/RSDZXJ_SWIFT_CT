@@ -84,7 +84,7 @@ class RSDMySharedCell: UITableViewCell {
     }
     
     func showScaneListCell(model: RSDScaneMySharedModel, subArraysss: Array<Any>) {
-        model.picurl = KEY_STING.getSuccessResultWithOldString(OldString: model.picurl ?? "")
+        model.picurl = KEY_STING.getServiceEmptyString(OldString: model.picurl ?? "")
         var newUrlString: String = ""
         if !model.picurl!.contains("http") {
             newUrlString = RSDBaseUrl_Real + model.picurl!
@@ -92,7 +92,7 @@ class RSDMySharedCell: UITableViewCell {
             newUrlString = model.picurl!
         }
         let url = URL(string: newUrlString)
-        leftImgView.kf.setImage(with: ImageResource(downloadURL: url!), placeholder: UIImage(named: "myhead"), options: nil, progressBlock: nil, completionHandler: nil)
+        leftImgView.kf.setImage(with: ImageResource(downloadURL: url!), placeholder: UIImage(named: "DefaultModeImage"), options: nil, progressBlock: nil, completionHandler: nil)
 
         titleLabel.text =  model.sceneName
         let subArray: [Any] = subArraysss.first as! Array

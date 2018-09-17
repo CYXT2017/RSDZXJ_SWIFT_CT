@@ -4,7 +4,7 @@
 //
 //  Created by ios on 2018/8/30.
 //  Copyright © 2018年 rsdznjj. All rights reserved.
-//
+// 我分享的页面， 设备分享和 场景分享页面  0 默认设备  1 场景
 
 import UIKit
 import SVProgressHUD
