@@ -8,3 +8,16 @@ ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/.DS_Store
 ZhiXiangJiaSwift/Pods/.DS_Store
 ZhiXiangJiaSwift/.DS_Store
 .DS_Store
+ZhiXiangJiaSwift/Pods/Pods.xcodeproj/xcuserdata/chentao.xcuserdatad/xcschemes/xcschememanagement.plist
+ZhiXiangJiaSwift/Pods/Pods.xcodeproj/xcuserdata/ios.xcuserdatad/xcschemes/xcschememanagement.plist
+ZhiXiangJiaSwift/Pods/Pods.xcodeproj/xcuserdata/Jack.xcuserdatad/xcschemes/xcschememanagement.plist
+ZhiXiangJiaSwift/ZhiXiangJiaSwift.xcodeproj/xcuserdata/chentao.xcuserdatad/xcschemes/xcschememanagement.plist
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/API/RSDDeviceAPI.swift
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/API/RSDPeosonalCenterApi.swift
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/API/RSDSceneAPI.swift
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/Core/Array+ZJ.swift
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/Core/Moya+ZJ.swift
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/Core/RSDNetworkError.swift
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/Core/RSDNetworkManager.swift
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/Core/RSDResponse.swift
+ZhiXiangJiaSwift/ZhiXiangJiaSwift/Helpers/NetWork/Core/RSDTools.swift
