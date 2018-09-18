@@ -57,7 +57,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         tabBarController = RSDRootViewController()
         tabBarController?.view.backgroundColor = UIColor.white
         self.window!.rootViewController = tabBarController
-        
+        RSDGetIphoneContact.requestAddressBookAuthorization();
+
         gestureBaseView = RSDGestureBaseView.init(frame: CGRect(x: 0, y: 0, width: (window?.frame.size.width)!, height: (window?.frame.size.height)!))
         window?.insertSubview(gestureBaseView!, at: 0)
         gestureBaseView?.isHidden = true;

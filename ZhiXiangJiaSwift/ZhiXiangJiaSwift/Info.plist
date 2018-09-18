@@ -8,6 +8,8 @@
 	<string>智享家想访问您的相册</string>
 	<key>NSCameraUsageDescription</key>
 	<string>智享家想打开的相机</string>
+	<key>NSContactsUsageDescription</key>
+	<string>wwwwrfdsf</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSAppTransportSecurity</key>

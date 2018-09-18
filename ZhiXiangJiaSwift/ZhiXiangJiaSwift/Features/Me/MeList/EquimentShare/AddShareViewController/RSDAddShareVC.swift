@@ -276,8 +276,10 @@ class RSDAddShareVC: UIViewController {
     }
     
     @objc  private  func searchBtnClicked() {
-        //        let addVC = RSDAddDeviceAndScanListVC()
-        //        addVC.title = "添加分享设备 self.navigationController?.pushViewController(addVC, animated: true)
+        let contactVC = RSDIphoneContactVC()
+        contactVC.title = "联系人"
+        contactVC.delegate = self
+        self.navigationController?.pushViewController(contactVC, animated: true)
     }
     
     //点击 进入添加设备页面
@@ -304,7 +306,11 @@ class RSDAddShareVC: UIViewController {
 }
 
 
-extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, AddDeviceAndScaneDelegate, RSDEditFuncConfigurationDelegate {
+extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, AddDeviceAndScaneDelegate, RSDEditFuncConfigurationDelegate, RSDChooseIphoneContactDelegate {
+    func seleIphoneContact(iphoneString: String) {
+        self.mainTextFieled.text = iphoneString
+    }
+    
     func chooseDeviceAndScaneMethod(selectArray: [Any]) {
         self.addShareEquimentArray = selectArray
         self.mainTableView.reloadData()
