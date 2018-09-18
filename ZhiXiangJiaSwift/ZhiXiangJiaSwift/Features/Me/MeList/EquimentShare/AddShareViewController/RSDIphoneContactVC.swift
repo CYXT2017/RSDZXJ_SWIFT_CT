@@ -4,10 +4,11 @@
 //
 //  Created by ios on 2018/9/18.
 //  Copyright © 2018年 rsdznjj. All rights reserved.
-//
+// 系统通讯录联系人列表页
 
 import UIKit
 
+// MARK: - 代理回调数据
 protocol RSDChooseIphoneContactDelegate: AnyObject {
     func seleIphoneContact(iphoneString: String)
 }
@@ -21,9 +22,10 @@ class RSDIphoneContactVC: UIViewController {
     /// 所有分组的key值
     var keysArray = [String]()
     
+    
+    // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
-
 //        navigationItem.title = "联系人"
         
         tableView = UITableView.init(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height), style: UITableViewStyle.plain)
@@ -31,7 +33,6 @@ class RSDIphoneContactVC: UIViewController {
         tableView.delegate = self
         tableView.rowHeight = 60.0
         view.addSubview(tableView)
-        
         
         // MARK: - 获取A~Z分组顺序的通讯录
         RSDGetIphoneContact.getOrderAddressBook(addressBookInfo: { (addressBookDict, nameKeys) in
@@ -70,11 +71,12 @@ class RSDIphoneContactVC: UIViewController {
     deinit{
         print("挂了")
     }
-    
+
 }
 
+
+// MARK: -  扩展
 extension RSDIphoneContactVC: UITableViewDelegate, UITableViewDataSource {
-    
     func numberOfSections(in tableView: UITableView) -> Int {
         return keysArray.count
     }

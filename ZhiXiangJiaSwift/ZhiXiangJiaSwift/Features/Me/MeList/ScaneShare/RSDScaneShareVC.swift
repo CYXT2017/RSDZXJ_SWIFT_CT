@@ -4,7 +4,7 @@
 //
 //  Created by ios on 2018/8/30.
 //  Copyright © 2018年 rsdznjj. All rights reserved.
-//
+//这个文件夹除了model有用 其余都没用上
 
 import UIKit
 import DNSPageView

@@ -12,9 +12,9 @@ import SwiftyJSON
 import Kingfisher
 
 class RSDSharedMeViewController: UIViewController {
-    private var sharedForMeArray: [Any]
+    private var sharedForMeArray: [Any]//列表数组
     private var deletIndex: Int = 0
-    private var shareForMeFuncConfigDicArray: [Any]
+    private var shareForMeFuncConfigDicArray: [Any] // 数组中保持的字典 设备权限页面需要的数据
     var signInt1 = 0
 
     //MARK: - LifeCycle
@@ -35,6 +35,9 @@ class RSDSharedMeViewController: UIViewController {
         setUpUI()
     }
     
+    
+    // MARK: - Private
+    // MARK:获取列表数据  都是获取设备列表或者场景列表之后 根据条件筛选中需要的数据
     private func getsharedForMeListData() {
         var parme: [String: Any] = Dictionary.init()
         parme["token"] = RSDUserLoginModel.users.token
@@ -84,6 +87,7 @@ class RSDSharedMeViewController: UIViewController {
         
     }
     
+    // MARK:布局
     private func setUpUI() {
         view.addSubview(self.mainTableView)
         self.mainTableView.backgroundColor = RSDBGViewColor
@@ -91,6 +95,7 @@ class RSDSharedMeViewController: UIViewController {
         self.mainTableView.register(UITableViewCell.classForCoder(), forCellReuseIdentifier: "mySharedCell")
     }
     
+    // MARK:删除
     private func deletShareDevice() {
         print("删除----\(deletIndex)" )
         var parm: [String: Any] = Dictionary.init()
@@ -131,6 +136,7 @@ class RSDSharedMeViewController: UIViewController {
         
     }
     
+    // MARK: - 懒加载
     lazy var mainTableView: UITableView = {
         let tableview = UITableView.init(frame: CGRect(x: 0, y: 0, width: RSDScreenWidth, height: view.height), style: .plain)
         tableview.delegate = self
@@ -146,6 +152,8 @@ class RSDSharedMeViewController: UIViewController {
     
 }
 
+
+// MARK: - 扩展
 extension RSDSharedMeViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1

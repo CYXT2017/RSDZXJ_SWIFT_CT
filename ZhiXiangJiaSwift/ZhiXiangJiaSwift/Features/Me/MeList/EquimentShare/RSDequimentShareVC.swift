@@ -9,10 +9,12 @@
 import UIKit
 import DNSPageView
 class RSDequimentShareVC: UIViewController {
-    var signInt = 0
+    var signInt = 0 //标记
     
+    // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        //修改第三方库 添加通知 判断点击回调
         NotificationCenter.default.addObserver(self, selector: #selector(self.showOrHideNavRightBtn(_:)), name: NSNotification.Name(rawValue: "getCurrentIndexNotif"), object: nil)
         // 创建DNSPageStyle，设置样式
         let style = DNSPageStyle()
@@ -45,6 +47,11 @@ class RSDequimentShareVC: UIViewController {
         }
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    // MARK: - Private
     @objc func showOrHideNavRightBtn(_ nofi: Notification) {
         //        self.mainTableView.reloadData()
         let dict = nofi.userInfo
@@ -55,17 +62,6 @@ class RSDequimentShareVC: UIViewController {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: UIView())
         }
     }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    lazy var navRightBtn: UIButton = {
-        let btn = UIButton.init(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-        btn.setImage(UIImage.init(named: "scene_right_add_normal"), for: .normal)
-        btn.addTarget(self, action: #selector(self.addDoing), for: .touchUpInside)
-        return btn
-    }()
     
     func creatNav() {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: self.navRightBtn)
@@ -79,20 +75,18 @@ class RSDequimentShareVC: UIViewController {
         self.navigationController?.pushViewController(addVC, animated: true)
     }
 
+    // MARK: - 懒加载
+    lazy var navRightBtn: UIButton = {
+        let btn = UIButton.init(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        btn.setImage(UIImage.init(named: "scene_right_add_normal"), for: .normal)
+        btn.addTarget(self, action: #selector(self.addDoing), for: .touchUpInside)
+        return btn
+    }()
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
  }
-
-//extension RSDequimentShareVC: DNSPageTitleViewDelegate {
-//    public func titleView(_ titleView: DNSPageTitleView, currentIndex: Int) {
-//        if currentIndex == 0 {
-//            self.creatNav()
-//        } else {
-//            self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: UIView())
-//        }
-//    }
-//}
 

@@ -4,7 +4,7 @@
 //
 //  Created by ios on 2018/9/7.
 //  Copyright © 2018年 rsdznjj. All rights reserved.
-//
+// 我分享的设备或者场景详情列表页
 
 import UIKit
 import SVProgressHUD
@@ -17,11 +17,13 @@ class RSDMyShareDetailListVC: UIViewController {
     var deviceId: String = ""
     var scraneID: String = ""
 
+    // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
     }
 
+    // MARK: - Private
     private func setUpUI() {
         view.addSubview(self.mainTableView)
         self.mainTableView.backgroundColor = RSDBGViewColor
@@ -33,6 +35,8 @@ class RSDMyShareDetailListVC: UIViewController {
             self.automaticallyAdjustsScrollViewInsets = false
         };
     }
+    
+    // MARK:删除设备或者场景
     private func deletShareDevice() {
         let subDic: [String: Any] =  self.listDataArray![deletIndex]  as! Dictionary
         var phoneStr = ""
@@ -75,6 +79,7 @@ class RSDMyShareDetailListVC: UIViewController {
         
     }
     
+    // MARK: - 懒加载
     lazy var mainTableView: UITableView = {
         let tableview = UITableView.init(frame: CGRect(x: 0, y: 0, width: RSDScreenWidth, height: view.height), style: .plain)
         tableview.delegate = self
@@ -91,7 +96,9 @@ class RSDMyShareDetailListVC: UIViewController {
 }
 
 
+// MARK: - 扩展
 extension RSDMyShareDetailListVC: UITableViewDelegate, UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
@@ -157,7 +164,6 @@ extension RSDMyShareDetailListVC: UITableViewDelegate, UITableViewDataSource {
             self.present(alertController, animated: true, completion: nil)
         }
     }
-    
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)

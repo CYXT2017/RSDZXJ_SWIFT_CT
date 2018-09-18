@@ -10,8 +10,8 @@ import UIKit
 import SVProgressHUD
 
 class RSDMyShareViewController: UIViewController {
-    private var mySharedArray: [Any]
-    private var mySharedSubArray: [Any]
+    private var mySharedArray: [Any] // 列表数组
+    private var mySharedSubArray: [Any] //我分享的子设备子场景数组
     private var deletIndex: Int = 0
     var signInt1 = 0
 
@@ -34,6 +34,7 @@ class RSDMyShareViewController: UIViewController {
 //        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
 
+    // MARK: - Private
     private func getMySharedDeviceListData() {
         var parme: [String: Any] = Dictionary.init()
         parme["token"] = RSDUserLoginModel.users.token
@@ -83,6 +84,7 @@ class RSDMyShareViewController: UIViewController {
 
     }
     
+    // MARK: 布局界面
     private func setUpUI() {
         view.addSubview(self.mainTableView)
         self.mainTableView.snp.makeConstraints { (make) in
@@ -101,6 +103,7 @@ class RSDMyShareViewController: UIViewController {
         
     }
     
+    // MARK: 删除我分享的设备或者场景
     private func deletShareDevice() {
         print("删除----\(deletIndex)" )
         var parm: [String: Any] = Dictionary.init()
@@ -150,16 +153,10 @@ class RSDMyShareViewController: UIViewController {
         }) { (error) in
             SVProgressHUD.showError(withStatus: error.localizedDescription)
         }
-        
-
-//        for itemArr in self.mySharedSubArray {
-//            let subArray: [Any] = (itemArr as! [Any]).first as! Array
-//            for
-//        }
-        
-        
     }
     
+    
+    // MARK: - 懒加载
     lazy var mainTableView: UITableView = {
        let tableview = UITableView.init(frame: CGRect(x: 0, y: 0, width: RSDScreenWidth, height: self.view.height), style: .plain)
         tableview.delegate = self
@@ -175,11 +172,13 @@ class RSDMyShareViewController: UIViewController {
 
 }
 
+
+// MARK: - 扩展
 extension RSDMyShareViewController: UITableViewDelegate, UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
-
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell: RSDMySharedCell! = tableView.dequeueReusableCell(withIdentifier: "mySharedCell") as? RSDMySharedCell

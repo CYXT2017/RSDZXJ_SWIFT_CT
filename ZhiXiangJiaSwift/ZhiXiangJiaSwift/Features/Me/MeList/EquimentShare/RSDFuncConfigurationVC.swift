@@ -4,17 +4,17 @@
 //
 //  Created by ios on 2018/9/7.
 //  Copyright © 2018年 rsdznjj. All rights reserved.
-//
+// 设备功能权限展示和编辑页面
 
 import UIKit
 import SVProgressHUD
 
+// MARK:代理 回调编辑的数据到 设备添加界面
 protocol RSDEditFuncConfigurationDelegate: AnyObject {
     func changeDataDic(dateBegin: String, dateEnd: String, timeBegin: String, timeEnd: String, repeatStr: String, accorPrame: [String: Any], repeatInts: Int)
 }
 
 class RSDFuncConfigurationVC: UIViewController {
-
     var signInt3 = 0
     weak var delegate: RSDEditFuncConfigurationDelegate?
     
@@ -25,7 +25,7 @@ class RSDFuncConfigurationVC: UIViewController {
     private var funcNameArray: [String] = Array.init()
     private var funcValueArray: [String] = Array.init()
 
-    //需要保存的参数
+    //需要保存的参数 代理回调上个页面的数据
     private var setRepeatDayArray: [String] = Array.init()
     private var dateBeginStr: String = ""
     private var dateEndStr: String = ""
@@ -33,14 +33,14 @@ class RSDFuncConfigurationVC: UIViewController {
     private var timeEndStr: String = ""
     private var repeatDayStr: String = ""
   
-    private var weekDayInt = 0 // 仅传参需要
+    private var weekDayInt = 0 // 仅传参需要 周几 或者 每天
     
     
     var editPickerView: RSDChooseAuthorityPickerView?//这个不能自定义 UI实在是太丑了 而且耗内存 加载速度太慢了 即使放在Didapper里面 也不理想 没办法只能用RSDChooseDateView代替重写了
     
     var editTimeView: RSDChooseTimeView?//时间选择的view
     
-    var editDateView2: RSDChooseDateView?
+    var editDateView2: RSDChooseDateView?//日期选择的view
     var editDateView: RSDChooseDateView?//本来想在把两个日期选择器写一起的 但是数据什么的都要分情况 还有别的问题  所以就用外部的2个大view 而不是内部的2个小pickerview
 
     //MARK: - LifeCycle
@@ -118,6 +118,7 @@ class RSDFuncConfigurationVC: UIViewController {
         repeatDayStr  = "每天"
     }
     
+    // MARK:布局UI
     private func setUpUI() {
         self.title = "功能权限配置"
         view.addSubview(self.mainTableView)

@@ -18,18 +18,22 @@ protocol AddDeviceAndScaneDelegate: NSObjectProtocol {
 class RSDAddDeviceAndScanListVC: UIViewController {
     var signInt4 = 0
 
-    private var dataListArray: [Any] = Array.init()
-    private var selectDataArray: [Any] = Array.init()
-    private var btnStateArray: [String] = Array.init()
+    private var dataListArray: [Any] = Array.init()//列表数据
+    private var selectDataArray: [Any] = Array.init()//选择的数据
+    private var btnStateArray: [String] = Array.init()//状态数组
 
-     weak var delegates: AddDeviceAndScaneDelegate?
+    weak var delegates: AddDeviceAndScaneDelegate?
 
+
+    // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         getShareData()
         self.setUpUI()
     }
     
+    
+    // MARK: - Private
     private func getShareData() {
         var parme: [String: Any] = Dictionary.init()
         parme["token"] = RSDUserLoginModel.users.token
@@ -110,6 +114,8 @@ class RSDAddDeviceAndScanListVC: UIViewController {
         }
     }
     
+    
+    // MARK: - 懒加载
     lazy var addDeviceBtn: UIButton = {
         let btn = UIButton.init()
         btn.setTitle("添加设备", for: .normal)
@@ -140,6 +146,8 @@ class RSDAddDeviceAndScanListVC: UIViewController {
         return btn
     }()
 
+    
+    // MARK: - BtnClick
     @objc private func chooseDevice(_ btn: UIButton) {
         btn.isSelected = !btn.isSelected
         if btn.isSelected {//选中所有
@@ -159,9 +167,7 @@ class RSDAddDeviceAndScanListVC: UIViewController {
     }
     
     
-    
-    
-    //添加设备 代理回调上个页面
+    // MARK:添加设备 代理回调上个页面
     @objc private func addDeviceBtnClick() {
         for (index, item) in self.btnStateArray.enumerated() {
             if item == "1" {
@@ -172,7 +178,7 @@ class RSDAddDeviceAndScanListVC: UIViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
-    //检查 是否所有设备都被选中
+    // MARK: 检查 是否所有设备都被选中
     private func checkDeviceIsAllChoose() {
         self.mainTableView.reloadData()
         if self.btnStateArray.contains("0") {
@@ -183,6 +189,7 @@ class RSDAddDeviceAndScanListVC: UIViewController {
         self.navRightBtn.isSelected = true
     }
     
+    // MARK:cell 按钮点击
     @objc private func click(_ btn: UIButton) {
         let btnIndex = btn.tag - 999
         if btn.isSelected {
@@ -202,11 +209,12 @@ class RSDAddDeviceAndScanListVC: UIViewController {
 }
 
 
+
+// MARK: - 扩展
 extension RSDAddDeviceAndScanListVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.dataListArray.count
     }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "mySharedCell")
@@ -265,6 +273,5 @@ extension RSDAddDeviceAndScanListVC: UITextFieldDelegate, UITableViewDelegate, U
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
-        
     }
 }

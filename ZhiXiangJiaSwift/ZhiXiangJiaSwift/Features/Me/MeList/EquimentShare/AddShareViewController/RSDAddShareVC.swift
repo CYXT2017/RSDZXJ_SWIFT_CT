@@ -4,7 +4,7 @@
 //
 //  Created by ios on 2018/9/11.
 //  Copyright © 2018年 rsdznjj. All rights reserved.
-//
+//添加设备或者场景主页面
 
 import UIKit
 import SVProgressHUD
@@ -12,24 +12,29 @@ import Kingfisher
 
 class RSDAddShareVC: UIViewController {
     var signInt3 = 0
-    private var addShareEquimentArray: [Any] = Array.init()
+    private var addShareEquimentArray: [Any] = Array.init()//列表展示的数组
 
+    //添加门锁需要的筛选条件
     var needToVerifySecurityCodeBool = false
     var verifySuccessBool = false
     var waitCount = 0
     
-    private var currentIndex = 0
+    private var currentIndex = 0//当前点击的 编辑过设备功能权限的设备index
     
+    
+    // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
 //        let nav: UIView = (self.navigationController?.navigationBar)!
 //        let lineView: UIView = findHairlineImageViewUnder(mainView: nav)
 //        lineView.isHidden = true
 //        self.navigationController?.navigationBar.setBackgroundImage(imageFromColor(color: UIColor.navBackGroundColor), for: UIBarPosition.any, barMetrics: UIBarMetrics.default)
-        self.navigationController?.navigationBar.shadowImage = UIImage()
+        self.navigationController?.navigationBar.shadowImage = UIImage()//去除导航栏底部的分割线 最简单的方法 上面的方法也可以
         self.setUpUI()
     }
     
+    // MARK: - Private
+    // MARK:根据颜色生成图片
     func imageFromColor(color: UIColor) -> UIImage {
         let rect: CGRect = CGRect(x: 0, y: 0, width: view.frame.size.width, height:  view.frame.size.height)
         UIGraphicsBeginImageContext(rect.size)
@@ -42,6 +47,7 @@ class RSDAddShareVC: UIViewController {
         return image!
     }
     
+    // MARK: 遍历导航栏视图 找到底部的细线并 删除
     func findHairlineImageViewUnder(mainView: UIView)->UIImageView!{
         if(mainView.isKind(of: UIImageView.classForCoder()) && mainView.bounds.size.height <= 1.0 ){
             return mainView as! UIImageView
@@ -57,13 +63,7 @@ class RSDAddShareVC: UIViewController {
         return nil
     }
     
-    //MARK:toolbar完成按钮点击
-    @objc func doneItemClick() {
-        if self.mainTextFieled.isFirstResponder {
-            self.mainTextFieled.resignFirstResponder()
-        }
-    
-    }
+    // MARK:布局UI
     private func setUpUI() {
         view.backgroundColor = UIColor.white
         self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(customView: self.navRightBtn)
@@ -147,6 +147,7 @@ class RSDAddShareVC: UIViewController {
     }
     
     
+    // MARK: - 懒加载
     lazy var mainTableView: UITableView = {
         let tableview = UITableView.init(frame: CGRect(x: 0, y: 0, width: RSDScreenWidth, height: 100), style: .plain)
         tableview.delegate = self
@@ -192,6 +193,15 @@ class RSDAddShareVC: UIViewController {
         return btn
     }()
 
+
+    // MARK: - BtnClick
+    //MARK:toolbar完成按钮点击
+    @objc func doneItemClick() {
+        if self.mainTextFieled.isFirstResponder {
+            self.mainTextFieled.resignFirstResponder()
+        }
+    }
+
     //分享设备
     @objc  private  func shareBtnClick() {
         if self.addShareEquimentArray.count == 0 {
@@ -234,7 +244,6 @@ class RSDAddShareVC: UIViewController {
                 }
             }
 
-
             //操作完成，调用主线程来刷新界面
             DispatchQueue.main.async {
                 let userPhone = self.mainTextFieled.text
@@ -271,10 +280,9 @@ class RSDAddShareVC: UIViewController {
                 }
             }
         }
-        
-
     }
     
+    // MARK: 进入系统通讯录联系人界面
     @objc  private  func searchBtnClicked() {
         let contactVC = RSDIphoneContactVC()
         contactVC.title = "联系人"
@@ -282,7 +290,7 @@ class RSDAddShareVC: UIViewController {
         self.navigationController?.pushViewController(contactVC, animated: true)
     }
     
-    //点击 进入添加设备页面
+    //点击 进入添加设备或者场景二级页面
     @objc  private  func addDoing() {
         self.mainTextFieled.resignFirstResponder()
         let addVC = RSDAddDeviceAndScanListVC()
@@ -294,9 +302,6 @@ class RSDAddShareVC: UIViewController {
         addVC.delegates = self
         self.navigationController?.pushViewController(addVC, animated: true)
     }
-
-    
-    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -306,20 +311,37 @@ class RSDAddShareVC: UIViewController {
 }
 
 
+// MARK: - 扩展
 extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, AddDeviceAndScaneDelegate, RSDEditFuncConfigurationDelegate, RSDChooseIphoneContactDelegate {
+    // MARK:通讯录联系人 回调
     func seleIphoneContact(iphoneString: String) {
         self.mainTextFieled.text = iphoneString
     }
     
+    // MARK:获取设备或者场景数据的回调
     func chooseDeviceAndScaneMethod(selectArray: [Any]) {
         self.addShareEquimentArray = selectArray
         self.mainTableView.reloadData()
     }
     
+    // MARK:权限页面保存的数据回调
+    func changeDataDic(dateBegin: String, dateEnd: String, timeBegin: String, timeEnd: String, repeatStr: String, accorPrame: [String : Any], repeatInts: Int) {
+        var subDic: [String: Any] =  self.addShareEquimentArray[currentIndex]  as! Dictionary
+        subDic["timebegin"] = timeBegin
+        subDic["timeend"] = timeEnd
+        subDic["datebegin"] = dateBegin
+        subDic["dateend"] = dateEnd
+        //        subDic["weekvalid"] = repeatStr
+        subDic["weekvalid"] = repeatInts
+        subDic["accessPermission"] = accorPrame
+    }
+    
+
+  
+    // MARK: - tableviewDelegate
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.addShareEquimentArray.count
     }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "mySharedCell")
@@ -351,20 +373,7 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
         cell.textLabel?.font = UIFont.systemFont(ofSize: 15)
         return cell
     }
-         
     
-    func changeDataDic(dateBegin: String, dateEnd: String, timeBegin: String, timeEnd: String, repeatStr: String, accorPrame: [String : Any], repeatInts: Int) {
-        var subDic: [String: Any] =  self.addShareEquimentArray[currentIndex]  as! Dictionary
-        subDic["timebegin"] = timeBegin
-        subDic["timeend"] = timeEnd
-        subDic["datebegin"] = dateBegin
-        subDic["dateend"] = dateEnd
-        //        subDic["weekvalid"] = repeatStr
-        subDic["weekvalid"] = repeatInts
-        subDic["accessPermission"] = accorPrame
-    }
-    
-
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if self.signInt3 == 1 {
@@ -390,6 +399,8 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
 //        textField.layer.opacity = 0.2
     }
     
+    
+    // MARK: - 保存设备接口
     func  addMyShareDeviceMethod(deviceArray: [Any], shareUser: String, completion: @escaping (_ resultBool: Bool, _ resultStr: String) -> ()) {
 //        var errorTemp: NSError = NSError.init()
         var arr: [Any] = Array.init()
@@ -424,6 +435,8 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
         }
     }
     
+    
+    // MARK: - 保存场景接口
     func  addScraneDataMethod(shareUser: String, completion: @escaping (_ resultBool: Bool, _ resultStr: String) -> ()) {
         var arr: [Any] = Array.init()
         for i in 0..<self.addShareEquimentArray.count {

@@ -5,24 +5,25 @@
 //
 //  Created by ios on 2018/9/14.
 //  Copyright © 2018年 rsdznjj. All rights reserved.
-//
+//设置周几或者每天的页面
 
 import UIKit
 import SVProgressHUD
 
+// MARK:代理回调选择的数据 上个页面进行展示
 protocol RSDSetRepeatDeleagte: AnyObject {
 
     func setRepeatDay(repeatStr: String, currentStateArray: [String], weekDayInt: Int)
 }
 
 class RSDSetRepeatVC: UIViewController {
-    
     weak var delegate: RSDSetRepeatDeleagte?
     
     let titleArray: [String] = ["周一","周二","周三","周四","周五","周六","周日"]
-    var stateArray: [String] = Array.init()
-    var repeatInt = 0
+    var stateArray: [String] = Array.init()//选中状态的数组
+    var repeatInt = 0 //默认选中 “每天”===接口重要显示传递的参数
     
+    // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.white
@@ -64,10 +65,8 @@ class RSDSetRepeatVC: UIViewController {
         }
     }
 
-    //MARK:保存重复信息
+    //MARK:保存信息
     @objc func saveBtnClick() {
-        
-        
         var setingString = ""
         var setArray: [String] = Array.init()
         if !self.stateArray.contains("0") {
@@ -116,6 +115,8 @@ class RSDSetRepeatVC: UIViewController {
     }
 }
 
+
+// MARK: - 扩展
 extension RSDSetRepeatVC: UITableViewDelegate, UITableViewDataSource {
     //MARK: - TableViewDelegate 和 dataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -156,8 +157,7 @@ extension RSDSetRepeatVC: UITableViewDelegate, UITableViewDataSource {
             self.stateArray[indexPath.row] = "1"
         }
         self.mainTableView.reloadData()
-    }
-    
+    }    
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
