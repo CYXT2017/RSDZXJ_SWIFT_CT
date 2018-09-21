@@ -12,27 +12,40 @@ import SVProgressHUD
 import Kingfisher
 
 protocol AddDeviceAndScaneDelegate: NSObjectProtocol {
-    func chooseDeviceAndScaneMethod(selectArray: [Any])
+    func chooseDeviceAndScaneMethod(selectArray: [Any], btnStateArr: [String])
 }
 
 class RSDAddDeviceAndScanListVC: UIViewController {
     var signInt4 = 0
 
-//    var preSelectArrat: [Any] = Array.init() //已经分享过的设备或者场景数据 ===为了筛选出列表数据
+//    var preSelectArray: [Any] = Array.init() //已经选中过的设备或者场景数据 = 再进页面不用再选==
+    
     private var dataListArray: [Any] = Array.init()//列表数据 设备是字典 场景是模型
     private var selectDataArray: [Any] = Array.init()//选择的数据
-    private var btnStateArray: [String] = Array.init()//状态数组
+    var btnStateArray: [String] = Array.init()//状态数组
 
     weak var delegates: AddDeviceAndScaneDelegate?
 
 
     // MARK: - LifeCycle
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        getShareData()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        getShareData()
         self.setUpUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.checkDeviceIsAllChoose()
+    }
     
     // MARK: - Private
     private func getShareData() {
@@ -62,15 +75,17 @@ class RSDAddDeviceAndScanListVC: UIViewController {
                         if deviceModel.device == RSD_EQUIPMENT_TYPE_WIFI_SCENESWITCH || deviceModel.device == RSD_EQUIPMENT_TYPE_WIFI_VOICEHOME || (deviceModel.device == RSD_EQUIPMENT_TYPE_433_CIRCLESWITCH_NO_POWER && deviceModel.model == RSD_CIRCLESWITCH_NO_POWER_TYPE_433_A2) || deviceModel.device == RSD_EQUIPMENT_TYPE_433_EMITTER_NO_POWER || (deviceModel.device == RSD_EQUIPMENT_TYPE_433_CIRCLESWITCH_NO_POWER && deviceModel.model == RSD_CIRCLESWITCH_NO_POWER_TYPE_433_A4) {
                             continue
                         }
-                        //FIXME: - 这里条件筛选不全 可能有问题 以后再说
+                        //FIXME: - 这里条件筛选不全 有问题 以后再说
                         if deviceModel.mainSubType == 1 {
                             weakSelf?.dataListArray.append(item)
                         }
                     }
                 }
                 if weakSelf?.dataListArray.count != 0 {
-                    for _ in 0...((weakSelf?.dataListArray.count)! - 1) {
-                        weakSelf?.btnStateArray.append("0")
+                    if  weakSelf?.btnStateArray.count == 0 {
+                        for _ in 0...((weakSelf?.dataListArray.count)! - 1) {
+                            weakSelf?.btnStateArray.append("0")
+                        }
                     }
                     DispatchQueue.main.async {
                         weakSelf?.mainTableView.reloadData()
@@ -175,13 +190,17 @@ class RSDAddDeviceAndScanListVC: UIViewController {
                 self.selectDataArray.append(self.dataListArray[index])
             }
         }
-        self.delegates?.chooseDeviceAndScaneMethod(selectArray: self.selectDataArray)
+        self.delegates?.chooseDeviceAndScaneMethod(selectArray: self.selectDataArray, btnStateArr: self.btnStateArray)
         self.navigationController?.popViewController(animated: true)
     }
     
     // MARK: 检查 是否所有设备都被选中
     private func checkDeviceIsAllChoose() {
         self.mainTableView.reloadData()
+        if self.btnStateArray.count == 0 {
+            self.navRightBtn.isSelected = false
+            return //有等于0 表示没有全选
+        }
         if self.btnStateArray.contains("0") {
             self.navRightBtn.isSelected = false
             return //有等于0 表示没有全选

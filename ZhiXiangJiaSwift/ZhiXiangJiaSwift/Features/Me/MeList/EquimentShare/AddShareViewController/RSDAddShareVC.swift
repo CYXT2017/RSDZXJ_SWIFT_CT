@@ -13,6 +13,7 @@ import Kingfisher
 class RSDAddShareVC: UIViewController {
     var signInt3 = 0
     private var addShareEquimentArray: [Any] = Array.init()//列表展示的数组
+    private var selectStateArray: [String] = Array.init()//下一个页面的选中状态数组
 
     //添加门锁需要的筛选条件
     var needToVerifySecurityCodeBool = false
@@ -20,7 +21,7 @@ class RSDAddShareVC: UIViewController {
     var waitCount = 0
     
     private var currentIndex = 0//当前点击的 编辑过设备功能权限的设备index
-    
+
     
     // MARK: - LifeCycle
     override func viewDidLoad() {
@@ -308,6 +309,9 @@ class RSDAddShareVC: UIViewController {
         if self.signInt3 == 1 {
             addVC.title = "添加场景"
         }
+        if self.addShareEquimentArray.count != 0 {
+            addVC.btnStateArray = self.selectStateArray
+        }
         addVC.signInt4 = self.signInt3
         addVC.delegates = self
         self.navigationController?.pushViewController(addVC, animated: true)
@@ -329,8 +333,9 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
     }
     
     // MARK:获取设备或者场景数据的回调
-    func chooseDeviceAndScaneMethod(selectArray: [Any]) {
+    func chooseDeviceAndScaneMethod(selectArray: [Any], btnStateArr: [String]) {
         self.addShareEquimentArray = selectArray
+        self.selectStateArray = btnStateArr
         self.mainTableView.reloadData()
     }
     
@@ -414,11 +419,11 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
     func  addMyShareDeviceMethod(deviceArray: [Any], shareUser: String, completion: @escaping (_ resultBool: Bool, _ resultStr: String) -> ()) {
 //        var errorTemp: NSError = NSError.init()
         var arr: [Any] = Array.init()
-         //FIXME: - 看了下OC版 摄像头相关很多代码 暂时先不写了
+         //FIXME: - 看了下OC版 摄像头相关很多代码 需要开通萤石云等等的 暂时先不写了  门锁相关的暂时也分享不了
         for i in 0..<self.addShareEquimentArray.count {
             let subDic: [String: Any] =  self.addShareEquimentArray[i]  as! Dictionary
             var dic: [String: Any] = Dictionary.init()
-            dic["deviceId"] = subDic["deviceId"]
+            dic["deviceid"] = subDic["deviceId"]
             dic["type"] = 2
             dic["timebegin"] = subDic["timebegin"]
             dic["timeend"] = subDic["timeend"]
