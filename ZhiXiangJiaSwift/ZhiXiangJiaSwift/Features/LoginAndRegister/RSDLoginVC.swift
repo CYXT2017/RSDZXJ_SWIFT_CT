@@ -53,14 +53,14 @@ class RSDLoginVC: UIViewController ,UITextFieldDelegate,getRegisterUserNameDeleg
         //        userNameStr = "13805604250"
         //        userPassWordStr = "111111"
         
-         useNameTextField.text  = "15391975293"
-         userPassWordTextField.text = "qqqqqq"
+//         useNameTextField.text  = "15391975293"
+//         userPassWordTextField.text = "qqqqqq"
         
 //        useNameTextField.text = "13805604250"
 //        userPassWordTextField.text = "111111"
 
-//                useNameTextField.text = "15395028093"
-//                userPassWordTextField.text = "111111"
+                useNameTextField.text = "15395028093"
+                userPassWordTextField.text = "111111"
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

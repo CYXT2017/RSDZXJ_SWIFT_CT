@@ -75,6 +75,9 @@ class RSDAddDeviceAndScanListVC: UIViewController {
                         if deviceModel.device == RSD_EQUIPMENT_TYPE_WIFI_SCENESWITCH || deviceModel.device == RSD_EQUIPMENT_TYPE_WIFI_VOICEHOME || (deviceModel.device == RSD_EQUIPMENT_TYPE_433_CIRCLESWITCH_NO_POWER && deviceModel.model == RSD_CIRCLESWITCH_NO_POWER_TYPE_433_A2) || deviceModel.device == RSD_EQUIPMENT_TYPE_433_EMITTER_NO_POWER || (deviceModel.device == RSD_EQUIPMENT_TYPE_433_CIRCLESWITCH_NO_POWER && deviceModel.model == RSD_CIRCLESWITCH_NO_POWER_TYPE_433_A4) {
                             continue
                         }
+                        if deviceModel.model == RSD_EQUIPMENT_TYPE_WIFI_CAMERA || deviceModel.model == RSD_EQUIPMENT_TYPE_NB_DOORLOCK || deviceModel.model == RSD_EQUIPMENT_TYPE_ZIGBEE_DOORLOCK  {
+                            continue //先去除门锁和摄像头相关 这个权限条件还没做
+                        }
                         //FIXME: - 这里条件筛选不全 有问题 以后再说
                         if deviceModel.mainSubType == 1 {
                             weakSelf?.dataListArray.append(item)

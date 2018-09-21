@@ -111,6 +111,8 @@ class RSDAdviceBackVC: UIViewController {
     @objc func pushAdviceListVC() {
         self.navigationController?.pushViewController(RSDAdviceListVC(), animated: true)
         self.testUI(showStr: "0")//这里有问题 当网速不好或者进入页面瞬间返回的时候 没看到反馈列表时 就改变这个页面的状态时不正确的逻辑 最好是等以上2个页面数据加载完 确认用户看到新回复时 再改变这个页面的状态 。但是 、、但是  但是这个页面不重要 随便洒洒水啦、
+   
+        //时隔大半个月我又回来了 最好是等进入历史反馈页面数据加载完成 发通知就好了
     }
  
     @objc func textViewTextDidChanges(_ notif : Notification) {

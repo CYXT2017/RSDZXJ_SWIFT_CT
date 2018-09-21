@@ -36,6 +36,7 @@ class RSDScaneListModel: NSObject {
         self.picurl = KEY_STING.getServiceEmptyString(OldString: mainDic["picurl"] ?? "")
         self.name = mainDic["name"] as? String
         self.owner = mainDic["owner"] as? Int
+//        self.owner = KEY_STING.getServiceEmptyString(OldString: mainDic["owner"] ?? "")
         self.id = mainDic["id"] as? String
     }
     

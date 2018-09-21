@@ -32,6 +32,7 @@ class RSDIphoneContactVC: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.rowHeight = 60.0
+        tableView.tableFooterView = UIView.init()
         view.addSubview(tableView)
         
         // MARK: - 获取A~Z分组顺序的通讯录
