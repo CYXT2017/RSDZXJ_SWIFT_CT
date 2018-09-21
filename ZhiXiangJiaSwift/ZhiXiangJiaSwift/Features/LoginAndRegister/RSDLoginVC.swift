@@ -46,6 +46,21 @@ class RSDLoginVC: UIViewController ,UITextFieldDelegate,getRegisterUserNameDeleg
         super.viewDidLoad()
         self.title = "登录"
         creatUIForLoginView()
+        
+//                 useNameTextField.text  = "18096618382"
+//                userPassWordTextField.text = "111111"
+
+        //        userNameStr = "13805604250"
+        //        userPassWordStr = "111111"
+        
+         useNameTextField.text  = "15391975293"
+         userPassWordTextField.text = "qqqqqq"
+        
+//        useNameTextField.text = "13805604250"
+//        userPassWordTextField.text = "111111"
+
+//                useNameTextField.text = "15395028093"
+//                userPassWordTextField.text = "111111"
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -121,14 +136,6 @@ class RSDLoginVC: UIViewController ,UITextFieldDelegate,getRegisterUserNameDeleg
             self.showMBProgressWithContents(content: "密码不能为空！")
             return
         }
-//        userNameStr = "13805604250"
-//        userPassWordStr = "111111"
-
-        userNameStr = "15391975293"
-        userPassWordStr = "qqqqqq"
-
-//        userNameStr = "15395028093"
-//        userPassWordStr = "111111"
         let encryptedPWD:String = DES3Util.aes128Encrypt(userPassWordStr, withKey: "royalstar-201510", withGiv: "smarthome-151015")
         var check:String = userNameStr!;
         check = check.appending(encryptedPWD)
@@ -152,9 +159,11 @@ class RSDLoginVC: UIViewController ,UITextFieldDelegate,getRegisterUserNameDeleg
             userDataModel.realname = userDic["realname"] as! String
             userDataModel.mobilephone = userDic["mobilephone"] as! String
             userDataModel.address = userDic["address"] as! String
-            userDataModel.email = userDic["email"] as! String
-            userDataModel.icon = userDic["icon"] as! String
-            userDataModel.id = userDic["id"] as! Int
+            userDataModel.email = KEY_STING.getServiceEmptyString(OldString: userDic["email"] ?? "")
+            userDataModel.icon = KEY_STING.getServiceEmptyString(OldString: userDic["icon"] ?? "")
+//            userDataModel.email = KEY_STING.getServiceEmptyString(OldString: userDic["email"])
+            //            userDataModel.icon = userDic["icon"] as! String
+//            userDataModel.id = userDic["id"] as! Int
             userDataModel.token = resultDic["token"] as! String
             userDataModel.saved()
         }) { (error) in

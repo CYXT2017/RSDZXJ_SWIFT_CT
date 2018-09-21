@@ -31,11 +31,17 @@ class RSDMyShareViewController: UIViewController {
         view.backgroundColor = RSDBGViewColor
         getMySharedDeviceListData()
         setUpUI()
-//        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        NotificationCenter.default.addObserver(self, selector: #selector(getMySharedDeviceListData), name: NSNotification.Name(rawValue: REFALSH_NOTIFICATION), object: nil)
     }
-
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     // MARK: - Private
-    private func getMySharedDeviceListData() {
+    //MARK:获取我分享的列表数据
+    @objc private func getMySharedDeviceListData() {
+        self.mySharedArray.removeAll()
         var parme: [String: Any] = Dictionary.init()
         parme["token"] = RSDUserLoginModel.users.token
         SVProgressHUD.show()
@@ -56,25 +62,32 @@ class RSDMyShareViewController: UIViewController {
                     return
                 }
                 let tempArray: NSArray = dic.object(forKey: "resultlist") as! NSArray
-                if self.signInt1 == 1 {
-                    for i in 0 ..< tempArray.count {
-                        let model: RSDScaneMySharedModel = RSDScaneMySharedModel()
-                        let tempArr: [Any] = model.getScraneSubArrayWithDic(dic: (tempArray[i] as? [String: Any])! ) as! [Any]
-                        weakSelf?.mySharedSubArray.append(tempArr)
-                        model.getScraneModelDataWithDic(mainDic: tempArray[i] as! [String: Any])
-                        weakSelf?.mySharedArray.append(model)
+                if tempArray.count != 0 {
+                    if self.signInt1 == 1 {
+                        for i in 0 ..< tempArray.count {
+                            let model: RSDScaneMySharedModel = RSDScaneMySharedModel()
+                            let tempArr: [Any] = model.getScraneSubArrayWithDic(dic: (tempArray[i] as? [String: Any])! ) as! [Any]
+                            weakSelf?.mySharedSubArray.append(tempArr)
+                            model.getScraneModelDataWithDic(mainDic: tempArray[i] as! [String: Any])
+                            weakSelf?.mySharedArray.append(model)
+                        }
+                    } else {
+                        for dic in tempArray {
+                            let model: RSDMySharedModel = RSDMySharedModel()
+                            let tempArr: [Any] = model.getSubArrayWithDic(dic: dic as! NSDictionary) as! [Any]
+                            weakSelf?.mySharedSubArray.append(tempArr)
+                            model.getModelDataWithDic(dic: dic as! NSDictionary)
+                            weakSelf?.mySharedArray.append(model)
+                        }
+                    }
+                    DispatchQueue.main.async {
+                        weakSelf?.noDataLable.isHidden = true
+                        weakSelf?.mainTableView.reloadData()
                     }
                 } else {
-                    for dic in tempArray {
-                        let model: RSDMySharedModel = RSDMySharedModel()
-                        let tempArr: [Any] = model.getSubArrayWithDic(dic: dic as! NSDictionary) as! [Any]
-                        weakSelf?.mySharedSubArray.append(tempArr)
-                        model.getModelDataWithDic(dic: dic as! NSDictionary)
-                        weakSelf?.mySharedArray.append(model)
+                    DispatchQueue.main.async {
+                        weakSelf?.showNoDataLabelMethod()
                     }
-                }
-                DispatchQueue.main.async {
-                    weakSelf?.mainTableView.reloadData()
                 }
             }
         }) { (error) in
@@ -100,8 +113,27 @@ class RSDMyShareViewController: UIViewController {
         self.mainTableView.backgroundColor = RSDBGViewColor
         self.mainTableView.tableFooterView = UIView()
         self.mainTableView.register(RSDMySharedCell.classForCoder(), forCellReuseIdentifier: "mySharedCell")
-        
     }
+    
+    func  showNoDataLabelMethod() {
+        self.noDataLable.isHidden = false
+        view.addSubview(self.noDataLable)
+        self.noDataLable.snp.makeConstraints { (make) in
+            make.center.equalToSuperview()
+        }
+        if  self.signInt1 == 0 {
+            self.noDataLable.text = "暂无分享设备"
+        } else {
+            self.noDataLable.text = "暂无分享场景"
+        }
+    }
+    
+    lazy var noDataLable: UILabel = {
+        let label = UILabel.init()
+        label.textColor = UIColor.black
+        label.font = UIFont.systemFont(ofSize: 17)
+        return label
+    }()
     
     // MARK: 删除我分享的设备或者场景
     private func deletShareDevice() {
@@ -122,19 +154,19 @@ class RSDMyShareViewController: UIViewController {
             }
         }
         if self.signInt1 == 1 {
-            ttt = RSDPeosonalCenterApi.deletMyShareScaneListData(parm)
             let model: RSDScaneMySharedModel = self.mySharedArray[deletIndex] as! RSDScaneMySharedModel
             var parm: [String: Any] = Dictionary.init()
             parm["customerIds"] = phoneArr
             parm["sceneId"] = model.sceneId
-            parm["token"] = RSDUserLoginModel.users.token
+            ttt = RSDPeosonalCenterApi.deletMyShareScaneListDatassss(parm)
         } else {
             let model: RSDMySharedModel = self.mySharedArray[deletIndex] as! RSDMySharedModel
             let deviceID = model.device_id
             parm["deviceid"] = deviceID
             parm["phonelist"] = phoneArr
-            //        parm["token"] = RSDUserLoginModel.users.token
+            ttt = RSDPeosonalCenterApi.deleMyShareDeviceData(parm)
         }
+        
         weak var weakSelf = self
         SVProgressHUD.show(withStatus: "取消分享中...")
  RSDNetWorkManager.shared.request(ttt,success: { (reslut) in
@@ -145,6 +177,10 @@ class RSDMyShareViewController: UIViewController {
            if (codeStr == "0000") {
                 DispatchQueue.main.async {
                     SVProgressHUD.showSuccess(withStatus: "取消分享成功")
+                    weakSelf?.mySharedArray.remove(at: (weakSelf?.deletIndex)!)
+                    if weakSelf?.mySharedArray.count == 0 {
+                        weakSelf?.showNoDataLabelMethod()
+                    }
                     weakSelf?.mainTableView.reloadData()
                 }
             } else {

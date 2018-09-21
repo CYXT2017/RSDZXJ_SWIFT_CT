@@ -221,6 +221,7 @@ class RSDAddShareVC: UIViewController {
             SVProgressHUD.showError(withStatus: "不能分享给自己")
             return
         }
+        SVProgressHUD.show(withStatus: "保存分享中...")
         DispatchQueue.global(qos: .default).async {
             if self.signInt3 == 0 {
                 for i in 0..<self.addShareEquimentArray.count {
@@ -248,14 +249,18 @@ class RSDAddShareVC: UIViewController {
             DispatchQueue.main.async {
                 let userPhone = self.mainTextFieled.text
                 weak var weakSelf = self
-                SVProgressHUD.show(withStatus: "保存分享中...")
                 if self.signInt3 == 1 {
                     self.addScraneDataMethod(shareUser: userPhone!, completion: { (success, errorMsg) in
                         if success {
                             if errorMsg.count == 0 {
-                                SVProgressHUD.showError(withStatus: "保存成功")
-                                weakSelf?.navigationController?.popViewController(animated: true)
-                                //FIXME: - 成功之后发通知 刷新界面
+                                DispatchQueue.main.async {
+                                    SVProgressHUD.showSuccess(withStatus: "保存成功")
+                                    //FIXME: - 成功之后发通知 刷新界面
+                                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:REFALSH_NOTIFICATION), object: nil)
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+                                        weakSelf?.navigationController?.popViewController(animated: true)
+                                    })
+                                }
                             } else {
                                 SVProgressHUD.showError(withStatus: errorMsg)
                             }
@@ -267,9 +272,14 @@ class RSDAddShareVC: UIViewController {
                     self.addMyShareDeviceMethod(deviceArray: self.addShareEquimentArray, shareUser: userPhone!, completion: { (success, errorMsg) in
                         if success {
                             if errorMsg.count == 0 {
-                                SVProgressHUD.showError(withStatus: "保存成功")
-                                weakSelf?.navigationController?.popViewController(animated: true)
-                                //FIXME: - 成功之后发通知 刷新界面
+                                DispatchQueue.main.async {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+                                        weakSelf?.navigationController?.popViewController(animated: true)
+                                    })
+                                    SVProgressHUD.showSuccess(withStatus: "保存成功")
+                                    //FIXME: - 成功之后发通知 刷新界面
+                                    NotificationCenter.default.post(name: NSNotification.Name(rawValue:REFALSH_NOTIFICATION), object: nil)
+                                }
                             } else {
                                 SVProgressHUD.showError(withStatus: errorMsg)
                             }
@@ -422,7 +432,7 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
         var params: [String: Any] = Dictionary.init()
         params["phone"] = shareUser
         params["inShareList"] = arr
-        RSDNetWorkManager.shared.request(RSDPeosonalCenterApi.UserAddMainDeviceShare(params), success: { (result) in
+            RSDNetWorkManager.shared.request(RSDPeosonalCenterApi.UserAddMainDeviceShare(params), success: { (result) in
             let dic: NSDictionary = dataToDictionary(data: result)! as NSDictionary
             let  codeStr = dic["code"] as? String
             if (codeStr == "0000") {
@@ -446,7 +456,6 @@ extension RSDAddShareVC: UITextFieldDelegate, UITableViewDelegate, UITableViewDa
         var params: [String: Any] = Dictionary.init()
         params["phone"] = shareUser
         params["sceneIds"] = arr
-//        params["token"] = RSDUserLoginModel.users.token
         RSDNetWorkManager.shared.request(RSDPeosonalCenterApi.addMyShareScaneListData(params), success: {(result) in
             let dic: NSDictionary = dataToDictionary(data: result)! as NSDictionary
             let  codeStr = dic["code"] as? String

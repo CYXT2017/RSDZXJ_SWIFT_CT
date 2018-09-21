@@ -18,7 +18,8 @@ protocol AddDeviceAndScaneDelegate: NSObjectProtocol {
 class RSDAddDeviceAndScanListVC: UIViewController {
     var signInt4 = 0
 
-    private var dataListArray: [Any] = Array.init()//列表数据
+//    var preSelectArrat: [Any] = Array.init() //已经分享过的设备或者场景数据 ===为了筛选出列表数据
+    private var dataListArray: [Any] = Array.init()//列表数据 设备是字典 场景是模型
     private var selectDataArray: [Any] = Array.init()//选择的数据
     private var btnStateArray: [String] = Array.init()//状态数组
 

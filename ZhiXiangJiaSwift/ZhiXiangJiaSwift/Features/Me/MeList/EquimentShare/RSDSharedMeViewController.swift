@@ -4,7 +4,7 @@
 //
 //  Created by ios on 2018/8/30.
 //  Copyright © 2018年 rsdznjj. All rights reserved.
-//被分享的页面  设备和场景页面 。、
+//MARK: // 被分享的页面  设备和场景页面 。、
 
 import UIKit
 import SVProgressHUD
@@ -35,9 +35,27 @@ class RSDSharedMeViewController: UIViewController {
         setUpUI()
     }
     
-    
+    func  showNoDataLabelMethod() {
+        self.noDataLable.isHidden = false
+        view.addSubview(self.noDataLable)
+        self.noDataLable.snp.makeConstraints { (make) in
+            make.center.equalToSuperview()
+        }
+        if  self.signInt1 == 0 {
+            self.noDataLable.text = "暂无被分享设备"
+        } else {
+            self.noDataLable.text = "暂无被分享场景"
+        }
+    }
+    lazy var noDataLable: UILabel = {
+        let label = UILabel.init()
+        label.textColor = UIColor.black
+        label.font = UIFont.systemFont(ofSize: 17)
+        return label
+    }()
+
     // MARK: - Private
-    // MARK:获取列表数据  都是获取设备列表或者场景列表之后 根据条件筛选中需要的数据
+    // MARK:获取列表数据  都是获取设备列表或者场景列表之后 根据条件筛选出需要的数据
     private func getsharedForMeListData() {
         var parme: [String: Any] = Dictionary.init()
         parme["token"] = RSDUserLoginModel.users.token
@@ -54,27 +72,33 @@ class RSDSharedMeViewController: UIViewController {
             let  codeStr = dic["code"] as? String
             if (codeStr == "0000") {
                 let tempArray: [Any] = dic["resultlist"] as! [Any]
-                if self.signInt1 == 1 {
-                    for i in 0 ..< tempArray.count {
-                        let model: RSDScaneMySharedModel = RSDScaneMySharedModel()
-                        model.getScraneModelDataWithDic(mainDic: tempArray[i] as! [String: Any])
-                        weakSelf?.shareForMeFuncConfigDicArray.append(tempArray[i] as! [String: Any])
-                        weakSelf?.sharedForMeArray.append(model)
-                    }
-                } else {
-                    for item in tempArray {
-                        let model = RSDDevicesModel.init()
-                        model.getDeviceModelWithDic(dic: item as! [String : Any])
-                        if model.mainSubType == 2 {
-                            
-                            weakSelf?.shareForMeFuncConfigDicArray.append(item)
+                if tempArray.count != 0 {
+                    if self.signInt1 == 1 {
+                        for i in 0 ..< tempArray.count {
+                            let model: RSDScaneMySharedModel = RSDScaneMySharedModel()
+                            model.getScraneModelDataWithDic(mainDic: tempArray[i] as! [String: Any])
+                            weakSelf?.shareForMeFuncConfigDicArray.append(tempArray[i] as! [String: Any])
                             weakSelf?.sharedForMeArray.append(model)
                         }
+                    } else {
+                        for item in tempArray {
+                            let model = RSDDevicesModel.init()
+                            model.getDeviceModelWithDic(dic: item as! [String : Any])
+                            if model.mainSubType == 2 {
+                                
+                                weakSelf?.shareForMeFuncConfigDicArray.append(item)
+                                weakSelf?.sharedForMeArray.append(model)
+                            }
+                        }
                     }
-                }
-                if weakSelf?.sharedForMeArray.count != 0 {
+                    if weakSelf?.sharedForMeArray.count != 0 {
+                        DispatchQueue.main.async {
+                            weakSelf?.mainTableView.reloadData()
+                        }
+                    }
+                } else {
                     DispatchQueue.main.async {
-                        weakSelf?.mainTableView.reloadData()
+                        weakSelf?.showNoDataLabelMethod()
                     }
                 }
             } else {
@@ -95,7 +119,7 @@ class RSDSharedMeViewController: UIViewController {
         self.mainTableView.register(UITableViewCell.classForCoder(), forCellReuseIdentifier: "mySharedCell")
     }
     
-    // MARK:删除
+    // MARK:删除 设备或者场景
     private func deletShareDevice() {
         print("删除----\(deletIndex)" )
         var parm: [String: Any] = Dictionary.init()
@@ -103,15 +127,13 @@ class RSDSharedMeViewController: UIViewController {
         if self.signInt1 == 1 {
             let model: RSDScaneMySharedModel = self.sharedForMeArray[deletIndex] as! RSDScaneMySharedModel
             var tempArr: [Any] = Array.init()
-            tempArr.append((model.id)!)
+            tempArr.append((model.sceneId)!)
             parm["ids"] = tempArr
-            parm["token"] = RSDUserLoginModel.users.token
             ttt = RSDPeosonalCenterApi.deletScaneSharedMeListData(parm)
         } else {
             let model: RSDDevicesModel = self.sharedForMeArray[deletIndex] as! RSDDevicesModel
             let deviceID = model.deviceId
-            parm["deviceID"] = deviceID
-            let a =  RSDUserLoginModel.users.token
+            parm["deviceId"] = deviceID
             ttt = RSDPeosonalCenterApi.deleShareForMeDeviceData(parm)
         }
 //        parm["token"] = RSDUserLoginModel.users.token
@@ -124,7 +146,11 @@ class RSDSharedMeViewController: UIViewController {
             let codeStr = dic["code"] as! String
             if (codeStr == "0000") {
                 DispatchQueue.main.async {
-                    SVProgressHUD.showSuccess(withStatus: "取消被分享成功")
+                    SVProgressHUD.showSuccess(withStatus: "放弃被分享成功")
+                    weakSelf?.sharedForMeArray .remove(at: (weakSelf?.deletIndex)!)
+                    if weakSelf?.sharedForMeArray.count == 0 {
+                        weakSelf?.showNoDataLabelMethod()
+                    }
                     weakSelf?.mainTableView.reloadData()
                 }
             } else {
@@ -138,7 +164,7 @@ class RSDSharedMeViewController: UIViewController {
     
     // MARK: - 懒加载
     lazy var mainTableView: UITableView = {
-        let tableview = UITableView.init(frame: CGRect(x: 0, y: 0, width: RSDScreenWidth, height: view.height), style: .plain)
+        let tableview = UITableView.init(frame: CGRect(x: 0, y: 0, width: RSDScreenWidth, height: view.height - 64 - 44), style: .plain)
         tableview.delegate = self
         tableview.dataSource = self
         tableview.separatorStyle = .none

@@ -57,7 +57,7 @@ class RSDMyShareDetailListVC: UIViewController {
         SVProgressHUD.show(withStatus: "取消分享中...")
         var ttt = RSDPeosonalCenterApi.deleMyShareDeviceData(parm)
         if self.signInt2 == 1 {
-            ttt = RSDPeosonalCenterApi.deletMyShareScaneListData(parm)
+            ttt = RSDPeosonalCenterApi.deletMyShareScaneListDatassss(parm)
         }
 
         RSDNetWorkManager.shared.request(ttt,success: { (reslut) in
@@ -67,8 +67,14 @@ class RSDMyShareDetailListVC: UIViewController {
             let codeStr = dic["code"] as! String
             if (codeStr == "0000") {
                 DispatchQueue.main.async {
+                    weakSelf?.listDataArray?.remove(at: (weakSelf?.deletIndex)!)
                     SVProgressHUD.showSuccess(withStatus: "取消分享成功")
-                    weakSelf?.mainTableView.reloadData()
+                    if weakSelf?.listDataArray?.count != 0 {
+                        weakSelf?.mainTableView.reloadData()
+                    } else {
+                        weakSelf?.navigationController?.popViewController(animated: true)
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue:REFALSH_NOTIFICATION), object: nil)
+                    }
                 }
             } else {
                 SVProgressHUD.showError(withStatus: dic.object(forKey: "msg") as? String)
@@ -113,13 +119,14 @@ extension RSDMyShareDetailListVC: UITableViewDelegate, UITableViewDataSource {
             var phoneStr = ""
             if self.signInt2 == 1 {
                 phoneStr = subDic["loginname"] as! String
+                cell.accessoryType = .none
             } else {
+                cell.accessoryType = .disclosureIndicator
                 phoneStr = subDic["phone"] as! String
             }
             cell.textLabel?.text = "分享给了: " +  phoneStr
         }
         cell.textLabel?.font = UIFont.systemFont(ofSize: 15)
-        cell.accessoryType = .disclosureIndicator
         return cell
     }
     

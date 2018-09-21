@@ -10,6 +10,8 @@ import Foundation
 
 public let  KEY_STING = "STRING"
 
+public let  REFALSH_NOTIFICATION = "ActionSuccessToRefalshPopViewNotification"
+
 // WiFi 设备类型
 let  RSD_EQUIPMENT_TYPE_WIFI_SOCKET =  "W1"
 let  RSD_EQUIPMENT_TYPE_WIFI_IR =  "W2"
